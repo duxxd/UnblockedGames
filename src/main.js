@@ -64,12 +64,32 @@ function renderGames() {
 
 function openGame(game) {
     gameTitle.textContent = game.title;
+    
+    // Show loading state
+    gameFrame.style.opacity = '0';
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'game-loading';
+    loadingIndicator.className = 'absolute inset-0 flex flex-col items-center justify-center gap-4 text-emerald-500';
+    loadingIndicator.innerHTML = `
+        <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+        <p class="font-medium animate-pulse">Loading ${game.title}...</p>
+    `;
+    gameFrame.parentElement.appendChild(loadingIndicator);
+
     if (game.sandbox) {
         gameFrame.setAttribute('sandbox', game.sandbox);
     } else {
         gameFrame.removeAttribute('sandbox');
     }
+    
     gameFrame.src = game.iframeUrl;
+    
+    gameFrame.onload = () => {
+        gameFrame.style.opacity = '1';
+        const loader = document.getElementById('game-loading');
+        if (loader) loader.remove();
+    };
+
     playerOverlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
@@ -77,7 +97,10 @@ function openGame(game) {
 function closeGame() {
     playerOverlay.classList.add('hidden');
     gameFrame.src = '';
+    gameFrame.style.opacity = '0';
     gameFrame.removeAttribute('sandbox');
+    const loader = document.getElementById('game-loading');
+    if (loader) loader.remove();
     document.body.style.overflow = 'auto';
 }
 
