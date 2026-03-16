@@ -1,5 +1,6 @@
 let games = [];
 let filteredGames = [];
+let currentGame = null;
 
 const gameGrid = document.getElementById('game-grid');
 const searchInput = document.getElementById('search-input');
@@ -8,6 +9,7 @@ const gameFrame = document.getElementById('game-frame');
 const gameTitle = document.getElementById('game-title');
 const closeBtn = document.getElementById('close-btn');
 const backBtn = document.getElementById('back-btn');
+const externalBtn = document.getElementById('external-btn');
 
 // Fetch games data
 async function init() {
@@ -63,6 +65,7 @@ function renderGames() {
 }
 
 function openGame(game) {
+    currentGame = game;
     gameTitle.textContent = game.title;
     
     // Show loading state
@@ -82,6 +85,9 @@ function openGame(game) {
         gameFrame.removeAttribute('sandbox');
     }
     
+    // Set referrerpolicy to no-referrer to help with some blocked embeds
+    gameFrame.setAttribute('referrerpolicy', 'no-referrer');
+    
     gameFrame.src = game.iframeUrl;
     
     gameFrame.onload = () => {
@@ -94,9 +100,12 @@ function openGame(game) {
         const loader = document.getElementById('game-loading');
         if (loader) {
             loader.innerHTML = `
-                <div class="text-red-500 text-center p-4">
+                <div class="text-red-500 text-center p-4 max-w-md">
                     <p class="font-bold text-xl mb-2">Failed to load game</p>
-                    <p class="text-sm opacity-80">The game files could not be found (404).<br>Please check the URL in games.json.</p>
+                    <p class="text-sm opacity-80 mb-4">The game files could not be found or are being blocked by security settings.</p>
+                    <button onclick="window.open('${game.iframeUrl}', '_blank')" class="bg-emerald-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-emerald-400 transition-colors">
+                        Open in New Tab
+                    </button>
                 </div>
             `;
         }
@@ -111,9 +120,11 @@ function closeGame() {
     gameFrame.src = '';
     gameFrame.style.opacity = '0';
     gameFrame.removeAttribute('sandbox');
+    gameFrame.removeAttribute('referrerpolicy');
     const loader = document.getElementById('game-loading');
     if (loader) loader.remove();
     document.body.style.overflow = 'auto';
+    currentGame = null;
 }
 
 searchInput.addEventListener('input', (e) => {
@@ -126,5 +137,10 @@ searchInput.addEventListener('input', (e) => {
 
 closeBtn.onclick = closeGame;
 backBtn.onclick = closeGame;
+externalBtn.onclick = () => {
+    if (currentGame) {
+        window.open(currentGame.iframeUrl, '_blank');
+    }
+};
 
 init();
