@@ -1,58 +1,107 @@
 export class Minesweeper {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
-        this.gridSize = 10;
-        this.minesCount = 15;
+        
+        // Difficulty presets
+        this.difficulties = {
+            easy: { size: 8, mines: 10 },
+            medium: { size: 10, mines: 15 },
+            hard: { size: 16, mines: 40 },
+            impossible: { size: 24, mines: 99 }
+        };
+        
+        // Default to medium
+        this.currentDifficulty = 'medium';
+        this.gridSize = this.difficulties.medium.size;
+        this.minesCount = this.difficulties.medium.mines;
+        
         this.board = [];
         this.flags = 0;
         this.gameOver = false;
         this.timer = 0;
         this.timerInterval = null;
+        this.isFirstClick = true;
 
         this.init();
     }
 
     init() {
         this.container.innerHTML = `
-            <div class="flex flex-col items-center gap-4">
-                <div class="flex justify-between w-full font-arcade text-gold-500 text-sm arcade-glow px-4">
+            <div class="flex flex-col items-center gap-2 w-full max-w-[500px] mx-auto">
+                
+                <div class="flex justify-between items-center w-full font-arcade text-gold-500 px-2">
+                    <select id="ms-difficulty" class="bg-black border border-gold-500 text-gold-500 font-arcade text-[10px] uppercase px-2 py-1 outline-none cursor-pointer">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="impossible">Impossible</option>
+                    </select>
+                    <button id="minesweeper-reset" class="bg-gold-500 text-black px-4 py-1 font-arcade text-[10px] uppercase hover:bg-gold-400 transition-colors">Reset</button>
+                </div>
+
+                <div class="flex justify-between w-full font-arcade text-gold-500 text-sm arcade-glow px-4 py-2 bg-black/50 border-t border-b border-gold-500/30">
                     <div id="mine-count">Mines: ${this.minesCount}</div>
                     <div id="minesweeper-timer">Time: 0</div>
                 </div>
-                <div id="minesweeper-grid" class="grid gap-1 bg-gold-500/20 p-1 medieval-border"></div>
-                <button id="minesweeper-reset" class="bg-gold-500 text-black px-4 py-1 font-arcade text-[10px] uppercase hover:bg-gold-400 transition-colors">Reset</button>
+                
+                <div class="relative w-full aspect-square bg-gold-500/20 p-1 medieval-border">
+                    <div id="minesweeper-grid" class="grid gap-[1px] w-full h-full"></div>
+                    
+                    <div id="ms-overlay" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center hidden z-10">
+                        <h2 id="ms-overlay-title" class="text-3xl md:text-5xl font-arcade mb-2 tracking-widest text-center"></h2>
+                        <p id="ms-overlay-sub" class="text-white font-arcade text-xs mb-6"></p>
+                        <button id="ms-overlay-btn" class="bg-gold-500 text-black px-6 py-2 font-arcade uppercase hover:bg-gold-400 transition-colors">Play Again</button>
+                    </div>
+                </div>
             </div>
         `;
 
         this.gridElement = document.getElementById('minesweeper-grid');
-        this.gridElement.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+        this.overlay = document.getElementById('ms-overlay');
+        this.overlayTitle = document.getElementById('ms-overlay-title');
+        this.overlaySub = document.getElementById('ms-overlay-sub');
         
-        this.resetBtn = document.getElementById('minesweeper-reset');
-        this.resetBtn.onclick = () => this.start();
+        // Event Listeners
+        document.getElementById('minesweeper-reset').onclick = () => this.start();
+        document.getElementById('ms-overlay-btn').onclick = () => this.start();
+        
+        const diffSelect = document.getElementById('ms-difficulty');
+        diffSelect.onchange = (e) => {
+            this.setDifficulty(e.target.value);
+        };
 
+        this.start();
+    }
+
+    setDifficulty(level) {
+        if (!this.difficulties[level]) return;
+        this.currentDifficulty = level;
+        this.gridSize = this.difficulties[level].size;
+        this.minesCount = this.difficulties[level].mines;
         this.start();
     }
 
     start() {
         this.gameOver = false;
+        this.isFirstClick = true;
         this.timer = 0;
         this.flags = 0;
         clearInterval(this.timerInterval);
+        
+        // Hide overlay
+        this.overlay.classList.add('hidden');
+        
+        // Update Grid Layout based on new size
+        this.gridElement.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+        this.gridElement.style.gridTemplateRows = `repeat(${this.gridSize}, 1fr)`;
+        
         this.updateTimer();
         this.updateMineCount();
-        this.createBoard();
+        this.createEmptyBoard();
         this.render();
-        
-        const inst = document.getElementById('game-instructions');
-        if (inst) inst.innerText = 'Left Click: Reveal • Right Click: Flag';
-
-        this.timerInterval = setInterval(() => {
-            this.timer++;
-            this.updateTimer();
-        }, 1000);
     }
 
-    createBoard() {
+    createEmptyBoard() {
         this.board = [];
         for (let r = 0; r < this.gridSize; r++) {
             let row = [];
@@ -67,13 +116,19 @@ export class Minesweeper {
             }
             this.board.push(row);
         }
+    }
 
-        // Place mines
+    placeMines(firstR, firstC) {
         let minesPlaced = 0;
+        
+        // Place mines randomly, but avoid the 3x3 area around the first click
         while (minesPlaced < this.minesCount) {
             let r = Math.floor(Math.random() * this.gridSize);
             let c = Math.floor(Math.random() * this.gridSize);
-            if (!this.board[r][c].mine) {
+            
+            let isSafeZone = Math.abs(r - firstR) <= 1 && Math.abs(c - firstC) <= 1;
+
+            if (!this.board[r][c].mine && !isSafeZone) {
                 this.board[r][c].mine = true;
                 minesPlaced++;
             }
@@ -100,16 +155,23 @@ export class Minesweeper {
 
     render() {
         this.gridElement.innerHTML = '';
+        
+        // Dynamic font size based on difficulty/grid size
+        const fontSize = this.gridSize > 15 ? 'text-[8px] md:text-[10px]' : 'text-[10px] md:text-sm';
+        const iconSize = this.gridSize > 15 ? 'text-[10px]' : 'text-base';
+
         for (let r = 0; r < this.gridSize; r++) {
             for (let c = 0; c < this.gridSize; c++) {
                 const cell = this.board[r][c];
                 const btn = document.createElement('div');
-                btn.className = 'w-8 h-8 md:w-10 md:h-10 flex items-center justify-center cursor-pointer font-arcade text-[10px] transition-all border border-gold-500/30';
+                
+                // Use w-full and h-full instead of fixed pixels so it scales perfectly in the grid
+                btn.className = `w-full h-full flex items-center justify-center cursor-pointer font-arcade transition-all border border-gold-500/20 select-none ${fontSize}`;
                 
                 if (cell.revealed) {
-                    btn.classList.add('bg-black/60');
+                    btn.classList.add('bg-black/80');
                     if (cell.mine) {
-                        btn.innerHTML = '💣';
+                        btn.innerHTML = `<span class="${iconSize}">💣</span>`;
                         btn.classList.add('bg-red-500/40');
                     } else if (cell.neighborMines > 0) {
                         btn.innerText = cell.neighborMines;
@@ -117,16 +179,21 @@ export class Minesweeper {
                         btn.style.color = colors[cell.neighborMines];
                     }
                 } else {
-                    btn.classList.add('bg-gold-500/10', 'hover:bg-gold-500/30');
+                    btn.classList.add('bg-gold-500/10', 'hover:bg-gold-500/40');
                     if (cell.flagged) {
-                        btn.innerHTML = '🚩';
+                        btn.innerHTML = `<span class="${iconSize}">🚩</span>`;
                     }
                 }
 
-                btn.onclick = () => this.reveal(r, c);
                 btn.oncontextmenu = (e) => {
                     e.preventDefault();
                     this.toggleFlag(r, c);
+                };
+
+                btn.onmousedown = (e) => {
+                    if (e.button === 0) {
+                        this.reveal(r, c);
+                    }
                 };
                 
                 this.gridElement.appendChild(btn);
@@ -136,6 +203,16 @@ export class Minesweeper {
 
     reveal(r, c) {
         if (this.gameOver || this.board[r][c].revealed || this.board[r][c].flagged) return;
+
+        if (this.isFirstClick) {
+            this.isFirstClick = false;
+            this.placeMines(r, c);
+            
+            this.timerInterval = setInterval(() => {
+                this.timer++;
+                this.updateTimer();
+            }, 1000);
+        }
 
         this.board[r][c].revealed = true;
 
@@ -171,8 +248,6 @@ export class Minesweeper {
     updateTimer() {
         const el = document.getElementById('minesweeper-timer');
         if (el) el.innerText = `Time: ${this.timer}`;
-        const scoreEl = document.getElementById('game-score');
-        if (scoreEl) scoreEl.innerText = `Time: ${this.timer}`;
     }
 
     updateMineCount() {
@@ -196,7 +271,7 @@ export class Minesweeper {
         this.gameOver = true;
         clearInterval(this.timerInterval);
         
-        // Reveal all mines
+        // Reveal all mines (and show incorrectly placed flags as crossed out if you wanted to get fancy later)
         for (let r = 0; r < this.gridSize; r++) {
             for (let c = 0; c < this.gridSize; c++) {
                 if (this.board[r][c].mine) this.board[r][c].revealed = true;
@@ -204,9 +279,16 @@ export class Minesweeper {
         }
         this.render();
 
+        // Show Overlay
         setTimeout(() => {
-            alert(win ? 'VICTORY! The field is clear.' : 'BOOM! Game Over.');
-        }, 100);
+            this.overlayTitle.innerText = win ? 'VICTORY' : 'DEFEAT';
+            this.overlayTitle.className = `text-4xl md:text-5xl font-arcade mb-2 tracking-widest text-center ${win ? 'text-green-500' : 'text-red-600'}`;
+            this.overlaySub.innerText = win 
+                ? `Cleared on ${this.currentDifficulty.toUpperCase()} in ${this.timer} seconds!`
+                : `You hit a mine after ${this.timer} seconds.`;
+            
+            this.overlay.classList.remove('hidden');
+        }, 300); // slight delay for dramatic effect
     }
 
     stop() {
