@@ -5,5 +5,19 @@
     "thumbnail": "https://picsum.photos/seed/tetris-arcade/400/300",
     "type": "internal",
     "class": "Tetris"
+  },
+  {
+    "id": "minesweeper",
+    "title": "Minesweeper",
+    "thumbnail": "https://picsum.photos/seed/minesweeper-arcade/400/300",
+    "type": "internal",
+    "class": "Minesweeper"
+  },
+  {
+    "id": "racing",
+    "title": "Medieval Racer",
+    "thumbnail": "https://picsum.photos/seed/racing-arcade/400/300",
+    "type": "internal",
+    "class": "Racing"
   }
 ]
