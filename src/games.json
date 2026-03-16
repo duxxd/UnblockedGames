@@ -26,5 +26,19 @@
     "thumbnail": "https://picsum.photos/seed/tower-defense-arcade/400/300",
     "type": "internal",
     "class": "TowerDefense"
+  },
+  {
+    "id": "apple-tycoon",
+    "title": "Apple Orchard Tycoon",
+    "thumbnail": "https://picsum.photos/seed/apple-orchard/400/300",
+    "type": "internal",
+    "class": "AppleTycoon"
+  },
+  {
+    "id": "dino-jump",
+    "title": "Dragon Jump",
+    "thumbnail": "https://picsum.photos/seed/dino-jump/400/300",
+    "type": "internal",
+    "class": "DinoJump"
   }
 ]

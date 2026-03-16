@@ -2,6 +2,8 @@ import { Tetris } from './tetris.js';
 import { Minesweeper } from './minesweeper.js';
 import { Racing } from './racing.js';
 import { TowerDefense } from './towerDefense.js';
+import { AppleTycoon } from './appleTycoon.js';
+import { DinoJump } from './dinoJump.js';
 
 let games = [];
 let filteredGames = [];
@@ -94,6 +96,10 @@ function openGame(game) {
             activeInternalGame = new Racing('game-canvas-wrapper');
         } else if (game.class === 'TowerDefense') {
             activeInternalGame = new TowerDefense('game-canvas-wrapper');
+        } else if (game.class === 'AppleTycoon') {
+            activeInternalGame = new AppleTycoon('game-canvas-wrapper');
+        } else if (game.class === 'DinoJump') {
+            activeInternalGame = new DinoJump('game-canvas-wrapper');
         }
     } else {
         iframeContainer.classList.remove('hidden');
