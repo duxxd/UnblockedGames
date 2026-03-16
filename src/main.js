@@ -7,6 +7,8 @@ import { DinoJump } from './dinoJump.js';
 import { Snake } from './snake.js';
 import { FlappyBird } from './flappyBird.js';
 import { Pong } from './pong.js';
+import { MonicaEscape } from './monicaEscape.js';
+import { Slots } from './slots.js';
 
 let games = [];
 let filteredGames = [];
@@ -116,6 +118,10 @@ function openGame(game) {
             activeInternalGame = new FlappyBird('game-canvas-wrapper');
         } else if (game.class === 'Pong') {
             activeInternalGame = new Pong('game-canvas-wrapper');
+        } else if (game.class === 'MonicaEscape') {
+            activeInternalGame = new MonicaEscape('game-canvas-wrapper');
+        } else if (game.class === 'Slots') {
+            activeInternalGame = new Slots('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {

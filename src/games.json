@@ -61,5 +61,19 @@
     "thumbnail": "https://picsum.photos/seed/pong-arcade/400/300",
     "type": "internal",
     "class": "Pong"
+  },
+  {
+    "id": "monica-escape",
+    "title": "Monica's Detention Escape",
+    "thumbnail": "https://picsum.photos/seed/school-escape/400/300",
+    "type": "internal",
+    "class": "MonicaEscape"
+  },
+  {
+    "id": "slots",
+    "title": "Royal Slots",
+    "thumbnail": "https://picsum.photos/seed/slots-arcade/400/300",
+    "type": "internal",
+    "class": "Slots"
   }
 ]
