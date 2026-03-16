@@ -5,14 +5,14 @@ export class TowerDefense {
         this.ctx = this.canvas.getContext('2d');
         this.container.appendChild(this.canvas);
 
-        this.width = 600; 
-        this.height = 650; 
+        this.width = 500; 
+        this.height = 550; 
         this.canvas.width = this.width;
         this.canvas.height = this.height;
 
         this.path = [
-            {x: 0, y: 300}, {x: 150, y: 300}, {x: 150, y: 100},
-            {x: 450, y: 100}, {x: 450, y: 500}, {x: 600, y: 500}
+            {x: 0, y: 250}, {x: 120, y: 250}, {x: 120, y: 80},
+            {x: 380, y: 80}, {x: 380, y: 420}, {x: 500, y: 420}
         ];
 
         this.towerTypes = {
@@ -80,7 +80,13 @@ export class TowerDefense {
 
     init() {
         this.canvas.addEventListener('mousedown', (e) => this.handleClick(e));
-        requestAnimationFrame((t) => this.update(t));
+    }
+
+    start() {
+        this.gameState = 'PLAYING';
+        this.resetGameData();
+        this.lastTime = performance.now();
+        this.update(performance.now());
     }
 
     updateUI() {
@@ -289,7 +295,7 @@ export class TowerDefense {
         }
 
         this.draw();
-        requestAnimationFrame((t) => this.update(t));
+        this.requestId = requestAnimationFrame((t) => this.update(t));
     }
 
     spawnEnemy() {
@@ -435,5 +441,11 @@ export class TowerDefense {
             this.ctx.fillRect(abX + 10, uiY + 15, slotW - 20, 70);
             this.ctx.fillStyle = '#fff'; this.ctx.fillText('FIRESTORM', abX + slotW/2, uiY + 45); this.ctx.fillText('80 MP', abX + slotW/2, uiY + 65);
         }
+    }
+
+    stop() {
+        if (this.requestId) cancelAnimationFrame(this.requestId);
+        if (this.canvas) this.canvas.removeEventListener('click', this.boundClick);
+        this.container.innerHTML = '';
     }
 }

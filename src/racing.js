@@ -65,8 +65,6 @@ export class Racing {
         document.addEventListener('keydown', this.boundKeyDown);
         document.addEventListener('keyup', this.boundKeyUp);
         this.canvas.addEventListener('pointerdown', this.boundPointerDown); // Supports touch and mouse
-
-        this.start();
     }
 
     start() {

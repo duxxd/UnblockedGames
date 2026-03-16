@@ -4,6 +4,8 @@ import { Racing } from './racing.js';
 import { TowerDefense } from './towerDefense.js';
 import { AppleTycoon } from './appleTycoon.js';
 import { DinoJump } from './dinoJump.js';
+import { Snake } from './snake.js';
+import { FlappyBird } from './flappyBird.js';
 
 let games = [];
 let filteredGames = [];
@@ -75,6 +77,14 @@ function renderGames() {
 }
 
 function openGame(game) {
+    // Stop any currently active internal game
+    if (activeInternalGame) {
+        if (typeof activeInternalGame.stop === 'function') {
+            activeInternalGame.stop();
+        }
+        activeInternalGame = null;
+    }
+
     currentGame = game;
     gameTitle.textContent = game.title;
     
@@ -89,7 +99,6 @@ function openGame(game) {
         
         if (game.class === 'Tetris') {
             activeInternalGame = new Tetris('game-canvas-wrapper');
-            activeInternalGame.start();
         } else if (game.class === 'Minesweeper') {
             activeInternalGame = new Minesweeper('game-canvas-wrapper');
         } else if (game.class === 'Racing') {
@@ -100,6 +109,14 @@ function openGame(game) {
             activeInternalGame = new AppleTycoon('game-canvas-wrapper');
         } else if (game.class === 'DinoJump') {
             activeInternalGame = new DinoJump('game-canvas-wrapper');
+        } else if (game.class === 'Snake') {
+            activeInternalGame = new Snake('game-canvas-wrapper');
+        } else if (game.class === 'FlappyBird') {
+            activeInternalGame = new FlappyBird('game-canvas-wrapper');
+        }
+
+        if (activeInternalGame && typeof activeInternalGame.start === 'function') {
+            activeInternalGame.start();
         }
     } else {
         iframeContainer.classList.remove('hidden');
@@ -155,7 +172,9 @@ function closeGame() {
     playerOverlay.classList.add('hidden');
     
     if (activeInternalGame) {
-        activeInternalGame.stop();
+        if (typeof activeInternalGame.stop === 'function') {
+            activeInternalGame.stop();
+        }
         activeInternalGame = null;
     }
 

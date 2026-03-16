@@ -40,5 +40,19 @@
     "thumbnail": "https://picsum.photos/seed/dino-jump/400/300",
     "type": "internal",
     "class": "DinoJump"
+  },
+  {
+    "id": "snake",
+    "title": "Neon Serpent",
+    "thumbnail": "https://picsum.photos/seed/snake-arcade/400/300",
+    "type": "internal",
+    "class": "Snake"
+  },
+  {
+    "id": "flappy-bird",
+    "title": "Dragon Flight",
+    "thumbnail": "https://picsum.photos/seed/flappy-arcade/400/300",
+    "type": "internal",
+    "class": "FlappyBird"
   }
 ]

@@ -69,6 +69,26 @@
             0% { bottom: 100%; }
             100% { bottom: -100px; }
         }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #000;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #fbbf24;
+            border-radius: 0;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+        }
+        #game-canvas-wrapper canvas {
+            display: block;
+            max-width: 100%;
+            height: auto !important;
+            max-height: 75vh;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body class="selection-gold">
@@ -140,11 +160,11 @@
                     </button>
                 </div>
             </div>
-            <div class="flex-1 bg-black relative p-4 flex items-center justify-center">
-                <div id="internal-game-container" class="hidden w-full h-full flex flex-col items-center justify-center gap-2 md:gap-4 p-2">
+            <div class="flex-1 bg-black relative overflow-y-auto custom-scrollbar">
+                <div id="internal-game-container" class="hidden w-full min-h-full flex flex-col items-center py-6 md:py-10 gap-4 md:gap-6">
                     <div id="game-score" class="font-arcade text-gold-500 text-xl md:text-2xl arcade-glow">Score: 0</div>
-                    <div id="game-canvas-wrapper" class="medieval-border p-1 bg-black"></div>
-                    <div id="game-instructions" class="font-medieval text-gold-500/60 text-[10px] md:text-sm uppercase tracking-widest text-center">
+                    <div id="game-canvas-wrapper" class="medieval-border p-1 bg-black max-w-[95vw] overflow-hidden"></div>
+                    <div id="game-instructions" class="font-medieval text-gold-500/60 text-[10px] md:text-sm uppercase tracking-widest text-center max-w-2xl px-4">
                         <!-- Instructions will be injected here -->
                     </div>
                 </div>

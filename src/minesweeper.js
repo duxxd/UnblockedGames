@@ -70,8 +70,6 @@ export class Minesweeper {
         diffSelect.onchange = (e) => {
             this.setDifficulty(e.target.value);
         };
-
-        this.start();
     }
 
     setDifficulty(level) {
