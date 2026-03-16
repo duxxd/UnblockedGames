@@ -5,7 +5,7 @@ export class Tetris {
         this.ctx = this.canvas.getContext('2d');
         this.container.appendChild(this.canvas);
 
-        this.gridSize = 30;
+        this.gridSize = 25;
         this.cols = 10;
         this.rows = 20;
         
@@ -111,8 +111,8 @@ export class Tetris {
                                      (y + offset.y) * this.gridSize,
                                      this.gridSize - 1, this.gridSize - 1);
                     
-                    // Add arcade glow effect
-                    this.ctx.shadowBlur = 10;
+                    // Add subtle arcade glow effect
+                    this.ctx.shadowBlur = 5;
                     this.ctx.shadowColor = this.colors[value];
                 }
             });
