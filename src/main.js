@@ -6,6 +6,7 @@ import { AppleTycoon } from './appleTycoon.js';
 import { DinoJump } from './dinoJump.js';
 import { Snake } from './snake.js';
 import { FlappyBird } from './flappyBird.js';
+import { Pong } from './pong.js';
 
 let games = [];
 let filteredGames = [];
@@ -113,6 +114,8 @@ function openGame(game) {
             activeInternalGame = new Snake('game-canvas-wrapper');
         } else if (game.class === 'FlappyBird') {
             activeInternalGame = new FlappyBird('game-canvas-wrapper');
+        } else if (game.class === 'Pong') {
+            activeInternalGame = new Pong('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {

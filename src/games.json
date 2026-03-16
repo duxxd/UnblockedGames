@@ -54,5 +54,12 @@
     "thumbnail": "https://picsum.photos/seed/flappy-arcade/400/300",
     "type": "internal",
     "class": "FlappyBird"
+  },
+  {
+    "id": "pong",
+    "title": "Medieval Pong",
+    "thumbnail": "https://picsum.photos/seed/pong-arcade/400/300",
+    "type": "internal",
+    "class": "Pong"
   }
 ]
