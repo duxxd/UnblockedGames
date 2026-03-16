@@ -1,38 +1,15 @@
 [
   {
     "id": "1",
-    "title": "2048",
-    "thumbnail": "https://picsum.photos/seed/2048/400/300",
-    "iframeUrl": "https://play2048.co/"
+    "title": "Gladihoppers",
+    "thumbnail": "https://picsum.photos/seed/gladihoppers/400/300",
+    "iframeUrl": "/wp-content/uploads/games/gladihoppers/"
   },
   {
     "id": "2",
-    "title": "Hextris",
-    "thumbnail": "https://picsum.photos/seed/hextris/400/300",
-    "iframeUrl": "https://hextris.io/"
-  },
-  {
-    "id": "3",
-    "title": "Doodle Jump (Clone)",
-    "thumbnail": "https://picsum.photos/seed/doodle/400/300",
-    "iframeUrl": "https://doodlejump.io/"
-  },
-  {
-    "id": "4",
-    "title": "Tetris",
-    "thumbnail": "https://picsum.photos/seed/tetris/400/300",
-    "iframeUrl": "https://tetris.com/play-tetris"
-  },
-  {
-    "id": "5",
-    "title": "Flappy Bird",
-    "thumbnail": "https://picsum.photos/seed/flappy/400/300",
-    "iframeUrl": "https://flappybird.io/"
-  },
-  {
-    "id": "6",
-    "title": "Pac-Man",
-    "thumbnail": "https://picsum.photos/seed/pacman/400/300",
-    "iframeUrl": "https://www.google.com/logos/2010/pacman10-i.html"
+    "title": "Retro Atari",
+    "thumbnail": "https://picsum.photos/seed/atari/400/300",
+    "iframeUrl": "https://74400070-atari-embeds.googleusercontent.com/embeds/16cb204cf3a9d4d223a0a3fd8b0eec5d/inner-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.es.WVkgP_1lvIk.O%2Fd%3D1%2Frs%3DAHpOoo-c6Cdx1P024RxwiBFfgcGlLtIitw%2Fm%3D__features__",
+    "sandbox": "allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-storage-access-by-user-activation"
   }
 ]

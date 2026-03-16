@@ -64,6 +64,11 @@ function renderGames() {
 
 function openGame(game) {
     gameTitle.textContent = game.title;
+    if (game.sandbox) {
+        gameFrame.setAttribute('sandbox', game.sandbox);
+    } else {
+        gameFrame.removeAttribute('sandbox');
+    }
     gameFrame.src = game.iframeUrl;
     playerOverlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -72,6 +77,7 @@ function openGame(game) {
 function closeGame() {
     playerOverlay.classList.add('hidden');
     gameFrame.src = '';
+    gameFrame.removeAttribute('sandbox');
     document.body.style.overflow = 'auto';
 }
 
