@@ -2,35 +2,51 @@ export class Slots {
 
 constructor(containerId){
 
-this.container = document.getElementById(containerId);
+this.container=document.getElementById(containerId);
 
-this.canvas = document.createElement("canvas");
-this.ctx = this.canvas.getContext("2d");
+this.canvas=document.createElement("canvas");
+this.ctx=this.canvas.getContext("2d");
 
 this.container.appendChild(this.canvas);
 
-this.width = 600;
-this.height = 450;
+this.width=600;
+this.height=450;
 
-this.canvas.width = this.width;
-this.canvas.height = this.height;
+this.canvas.width=this.width;
+this.canvas.height=this.height;
 
 
-// SYMBOL WEIGHTS (rarity)
+// realistic casino sounds
+this.sounds = {
 
-this.symbolWeights = [
-{symbol:"🍒", weight:35},
-{symbol:"🍋", weight:25},
-{symbol:"🍀", weight:15},
-{symbol:"🔔", weight:12},
-{symbol:"💎", weight:8},
-{symbol:"7️⃣", weight:5}
+spin: new Audio("https://orangefreesounds.com/wp-content/uploads/2024/12/Slot-machine-sound-effect.mp3"),
+
+win: new Audio("https://assets.mixkit.co/active_storage/sfx/2001/2001-preview.mp3"),
+
+bigwin: new Audio("https://assets.mixkit.co/active_storage/sfx/1998/1998-preview.mp3"),
+
+jackpot: new Audio("https://www.orangefreesounds.com/wp-content/uploads/2017/09/Slot-machine-jackpot-sound-effect.mp3")
+
+};
+
+// spin loops while reels spin
+this.sounds.spin.loop = true;
+
+// ---------------- SYMBOL WEIGHTS ----------------
+
+this.symbolWeights=[
+{symbol:"🍒",weight:35},
+{symbol:"🍋",weight:25},
+{symbol:"🍀",weight:15},
+{symbol:"🔔",weight:12},
+{symbol:"💎",weight:8},
+{symbol:"7️⃣",weight:5}
 ];
 
-this.symbols = this.symbolWeights.map(s=>s.symbol);
+this.symbols=this.symbolWeights.map(s=>s.symbol);
 
-this.reelCount = 3;
-this.reels = [];
+this.reelCount=3;
+this.reels=[];
 
 this.spinning=false;
 
@@ -53,7 +69,7 @@ this.boundClick=this.handleClick.bind(this);
 }
 
 
-// ---------------- SYMBOL GENERATION ----------------
+// ---------------- SYMBOL POOL ----------------
 
 buildPool(){
 
@@ -97,7 +113,6 @@ symbols:this.getRandomSymbols(30),
 
 offset:0,
 speed:0,
-
 velocity:0,
 
 stopping:false,
@@ -125,7 +140,7 @@ this.update();
 }
 
 
-// ---------------- CLICK HANDLER ----------------
+// ---------------- CLICK ----------------
 
 handleClick(e){
 
@@ -179,6 +194,13 @@ this.spinning=true;
 
 this.lastWin=0;
 
+
+// play spin sound
+
+this.sounds.spin.currentTime=0;
+this.sounds.spin.play();
+
+
 this.reels.forEach((reel,i)=>{
 
 reel.speed=30+Math.random()*5;
@@ -200,7 +222,7 @@ reel.stopping=true;
 }
 
 
-// ---------------- UPDATE LOOP ----------------
+// ---------------- UPDATE ----------------
 
 update(){
 
@@ -248,7 +270,6 @@ reel.stopped=true;
 }
 
 }
-
 else{
 
 reel.offset+=reel.speed;
@@ -263,15 +284,16 @@ if(allStopped){
 
 this.spinning=false;
 
+this.sounds.spin.pause();
+this.sounds.spin.currentTime=0;
+
 this.checkWin();
 
 }
 
 }
 
-if(this.winFlash>0){
-this.winFlash--;
-}
+if(this.winFlash>0) this.winFlash--;
 
 this.draw();
 
@@ -307,6 +329,8 @@ payout=this.jackpot;
 
 this.jackpot=1000;
 
+this.sounds.jackpot.play();
+
 }
 
 
@@ -331,6 +355,7 @@ payout=this.bet*2;
 
 }
 
+
 if(payout>0){
 
 this.lastWin=payout;
@@ -338,6 +363,12 @@ this.lastWin=payout;
 this.credits+=payout;
 
 this.winFlash=20;
+
+if(payout>=this.bet*10){
+this.sounds.bigwin.play();
+}else{
+this.sounds.win.play();
+}
 
 }
 
@@ -355,7 +386,6 @@ this.ctx.fillRect(0,0,this.width,this.height);
 // frame
 
 this.ctx.fillStyle="#2d2d2d";
-
 this.ctx.fillRect(50,50,500,250);
 
 
@@ -372,9 +402,7 @@ const centerY=startY+reelHeight/2;
 this.ctx.save();
 
 this.ctx.beginPath();
-
 this.ctx.rect(startX,startY,reelWidth*3+40,reelHeight);
-
 this.ctx.clip();
 
 this.reels.forEach((reel,i)=>{
@@ -415,14 +443,12 @@ this.ctx.strokeStyle="red";
 this.ctx.lineWidth=4;
 
 this.ctx.beginPath();
-
 this.ctx.moveTo(startX-10,centerY);
 this.ctx.lineTo(startX+reelWidth*3+50,centerY);
-
 this.ctx.stroke();
 
 
-// flash
+// win flash
 
 if(this.winFlash>0){
 
@@ -432,24 +458,20 @@ this.ctx.fillRect(50,50,500,250);
 }
 
 
-// top hud
+// HUD
 
 this.ctx.fillStyle="#fbbf24";
 this.ctx.font="bold 20px Arial";
 
 this.ctx.textAlign="left";
-
 this.ctx.fillText(`COINS: ${this.credits}`,50,35);
 
 this.ctx.textAlign="center";
-
 this.ctx.fillText(`JACKPOT: ${this.jackpot}`,300,35);
-
 
 if(this.lastWin>0){
 
 this.ctx.fillStyle="#10b981";
-
 this.ctx.fillText(`WIN +${this.lastWin}`,300,60);
 
 }
@@ -458,13 +480,10 @@ this.ctx.fillText(`WIN +${this.lastWin}`,300,60);
 // spin button
 
 this.ctx.fillStyle=this.spinning?"#555":"#ef4444";
-
 this.ctx.fillRect(200,360,200,60);
 
 this.ctx.fillStyle="white";
-
 this.ctx.font="bold 24px Arial";
-
 this.ctx.fillText("SPIN",300,398);
 
 
