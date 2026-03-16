@@ -1,15 +1,9 @@
 [
   {
-    "id": "1",
-    "title": "Gladihoppers",
-    "thumbnail": "https://picsum.photos/seed/gladihoppers/400/300",
-    "iframeUrl": "wp-content/uploads/games/gladihoppers/"
-  },
-  {
     "id": "2",
-    "title": "Retro Atari",
-    "thumbnail": "https://picsum.photos/seed/atari/400/300",
-    "iframeUrl": "https://74400070-atari-embeds.googleusercontent.com/embeds/16cb204cf3a9d4d223a0a3fd8b0eec5d/inner-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.es.WVkgP_1lvIk.O%2Fd%3D1%2Frs%3DAHpOoo-c6Cdx1P024RxwiBFfgcGlLtIitw%2Fm%3D__features__",
+    "title": "Tetris",
+    "thumbnail": "https://picsum.photos/seed/tetris/400/300",
+    "iframeUrl": "https://www.gstatic.com/atari/embeds/83a60601c213b72fb19c1855fb0c5f26/intermediate-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.es.WVkgP_1lvIk.O%2Fd%3D1%2Frs%3DAHpOoo-c6Cdx1P024RxwiBFfgcGlLtIitw%2Fm%3D__features__&r=969255473",
     "sandbox": "allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-storage-access-by-user-activation"
   }
 ]

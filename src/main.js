@@ -90,6 +90,18 @@ function openGame(game) {
         if (loader) loader.remove();
     };
 
+    gameFrame.onerror = () => {
+        const loader = document.getElementById('game-loading');
+        if (loader) {
+            loader.innerHTML = `
+                <div class="text-red-500 text-center p-4">
+                    <p class="font-bold text-xl mb-2">Failed to load game</p>
+                    <p class="text-sm opacity-80">The game files could not be found (404).<br>Please check the URL in games.json.</p>
+                </div>
+            `;
+        }
+    };
+
     playerOverlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
