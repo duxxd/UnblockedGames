@@ -242,7 +242,7 @@ export class Tetris {
     }
 
     updateScore() {
-        const scoreElement = document.getElementById('tetris-score');
+        const scoreElement = document.getElementById('game-score');
         if (scoreElement) {
             scoreElement.innerText = `Score: ${this.player.score}`;
         }
@@ -264,9 +264,15 @@ export class Tetris {
         }
     }
 
+    setInstructions() {
+        const inst = document.getElementById('game-instructions');
+        if (inst) inst.innerText = 'Arrows to Move & Drop • Up/W/Q to Rotate';
+    }
+
     start() {
         this.playerReset();
         this.updateScore();
+        this.setInstructions();
         this.update();
         document.addEventListener('keydown', this.boundKeyDown);
     }

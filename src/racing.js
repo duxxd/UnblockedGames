@@ -61,6 +61,10 @@ export class Racing {
         this.gameSpeed = 5;
         this.obstacleInterval = 1200;
         this.updateScore();
+
+        const inst = document.getElementById('game-instructions');
+        if (inst) inst.innerText = 'Arrows to Switch Lanes • Collect Gold!';
+
         this.update();
     }
 
@@ -71,7 +75,7 @@ export class Racing {
     }
 
     updateScore() {
-        const el = document.getElementById('tetris-score');
+        const el = document.getElementById('game-score');
         if (el) el.innerText = `Gold: ${this.gold} | Dist: ${Math.floor(this.score)}m`;
     }
 

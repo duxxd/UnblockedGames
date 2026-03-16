@@ -43,6 +43,9 @@ export class Minesweeper {
         this.createBoard();
         this.render();
         
+        const inst = document.getElementById('game-instructions');
+        if (inst) inst.innerText = 'Left Click: Reveal • Right Click: Flag';
+
         this.timerInterval = setInterval(() => {
             this.timer++;
             this.updateTimer();
@@ -168,6 +171,8 @@ export class Minesweeper {
     updateTimer() {
         const el = document.getElementById('minesweeper-timer');
         if (el) el.innerText = `Time: ${this.timer}`;
+        const scoreEl = document.getElementById('game-score');
+        if (scoreEl) scoreEl.innerText = `Time: ${this.timer}`;
     }
 
     updateMineCount() {

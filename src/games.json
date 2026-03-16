@@ -19,5 +19,12 @@
     "thumbnail": "https://picsum.photos/seed/racing-arcade/400/300",
     "type": "internal",
     "class": "Racing"
+  },
+  {
+    "id": "tower-defense",
+    "title": "Kingdom Guard",
+    "thumbnail": "https://picsum.photos/seed/tower-defense-arcade/400/300",
+    "type": "internal",
+    "class": "TowerDefense"
   }
 ]

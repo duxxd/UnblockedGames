@@ -1,6 +1,7 @@
 import { Tetris } from './tetris.js';
 import { Minesweeper } from './minesweeper.js';
 import { Racing } from './racing.js';
+import { TowerDefense } from './towerDefense.js';
 
 let games = [];
 let filteredGames = [];
@@ -91,6 +92,8 @@ function openGame(game) {
             activeInternalGame = new Minesweeper('game-canvas-wrapper');
         } else if (game.class === 'Racing') {
             activeInternalGame = new Racing('game-canvas-wrapper');
+        } else if (game.class === 'TowerDefense') {
+            activeInternalGame = new TowerDefense('game-canvas-wrapper');
         }
     } else {
         iframeContainer.classList.remove('hidden');
