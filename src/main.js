@@ -1,11 +1,16 @@
+import { Tetris } from './tetris.js';
+
 let games = [];
 let filteredGames = [];
 let currentGame = null;
+let activeInternalGame = null;
 
 const gameGrid = document.getElementById('game-grid');
 const searchInput = document.getElementById('search-input');
 const playerOverlay = document.getElementById('player-overlay');
 const gameFrame = document.getElementById('game-frame');
+const iframeContainer = document.getElementById('iframe-container');
+const internalContainer = document.getElementById('internal-game-container');
 const gameTitle = document.getElementById('game-title');
 const closeBtn = document.getElementById('close-btn');
 const backBtn = document.getElementById('back-btn');
@@ -37,24 +42,24 @@ function renderGames() {
 
     filteredGames.forEach(game => {
         const card = document.createElement('div');
-        card.className = 'group relative bg-white/5 rounded-2xl overflow-hidden border border-white/10 cursor-pointer hover:border-emerald-500/50 transition-all hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-1';
+        card.className = 'group relative bg-black/40 rounded-none overflow-hidden border-4 border-gold-500/30 cursor-pointer hover:border-gold-500 transition-all hover:shadow-[0_0_20px_rgba(251,191,36,0.2)] transform hover:-translate-y-1';
         card.innerHTML = `
-            <div class="aspect-video relative overflow-hidden">
+            <div class="aspect-video relative overflow-hidden border-b-4 border-gold-500/30 group-hover:border-gold-500 transition-colors">
                 <img
                     src="${game.thumbnail}"
                     alt="${game.title}"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                     referrerpolicy="no-referrer"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div class="bg-emerald-500 text-black px-4 py-2 rounded-full font-bold flex items-center gap-2">
-                        Play Now
+                    <div class="bg-gold-500 text-black px-6 py-2 font-arcade text-[10px] uppercase tracking-widest shadow-lg">
+                        START GAME
                     </div>
                 </div>
             </div>
-            <div class="p-4">
-                <h3 class="font-semibold text-lg group-hover:text-emerald-400 transition-colors">
+            <div class="p-5">
+                <h3 class="font-medieval font-bold text-xl text-gold-500 uppercase tracking-wider group-hover:arcade-glow transition-all">
                     ${game.title}
                 </h3>
             </div>
@@ -68,48 +73,64 @@ function openGame(game) {
     currentGame = game;
     gameTitle.textContent = game.title;
     
-    // Show loading state
-    gameFrame.style.opacity = '0';
-    const loadingIndicator = document.createElement('div');
-    loadingIndicator.id = 'game-loading';
-    loadingIndicator.className = 'absolute inset-0 flex flex-col items-center justify-center gap-4 text-emerald-500';
-    loadingIndicator.innerHTML = `
-        <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-        <p class="font-medium animate-pulse">Loading ${game.title}...</p>
-    `;
-    gameFrame.parentElement.appendChild(loadingIndicator);
+    // Reset views
+    iframeContainer.classList.add('hidden');
+    internalContainer.classList.add('hidden');
+    externalBtn.classList.remove('hidden');
 
-    if (game.sandbox) {
-        gameFrame.setAttribute('sandbox', game.sandbox);
-    } else {
-        gameFrame.removeAttribute('sandbox');
-    }
-    
-    // Set referrerpolicy to no-referrer to help with some blocked embeds
-    gameFrame.setAttribute('referrerpolicy', 'no-referrer');
-    
-    gameFrame.src = game.iframeUrl;
-    
-    gameFrame.onload = () => {
-        gameFrame.style.opacity = '1';
-        const loader = document.getElementById('game-loading');
-        if (loader) loader.remove();
-    };
-
-    gameFrame.onerror = () => {
-        const loader = document.getElementById('game-loading');
-        if (loader) {
-            loader.innerHTML = `
-                <div class="text-red-500 text-center p-4 max-w-md">
-                    <p class="font-bold text-xl mb-2">Failed to load game</p>
-                    <p class="text-sm opacity-80 mb-4">The game files could not be found or are being blocked by security settings.</p>
-                    <button onclick="window.open('${game.iframeUrl}', '_blank')" class="bg-emerald-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-emerald-400 transition-colors">
-                        Open in New Tab
-                    </button>
-                </div>
-            `;
+    if (game.type === 'internal') {
+        externalBtn.classList.add('hidden');
+        internalContainer.classList.remove('hidden');
+        
+        if (game.class === 'Tetris') {
+            activeInternalGame = new Tetris('game-canvas-wrapper');
+            activeInternalGame.start();
         }
-    };
+    } else {
+        iframeContainer.classList.remove('hidden');
+        // Show loading state
+        gameFrame.style.opacity = '0';
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'game-loading';
+        loadingIndicator.className = 'absolute inset-0 flex flex-col items-center justify-center gap-4 text-gold-500';
+        loadingIndicator.innerHTML = `
+            <div class="w-12 h-12 border-4 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
+            <p class="font-medieval font-medium animate-pulse">Summoning ${game.title}...</p>
+        `;
+        gameFrame.parentElement.appendChild(loadingIndicator);
+
+        if (game.sandbox) {
+            gameFrame.setAttribute('sandbox', game.sandbox);
+        } else {
+            gameFrame.removeAttribute('sandbox');
+        }
+        
+        // Set referrerpolicy to no-referrer to help with some blocked embeds
+        gameFrame.setAttribute('referrerpolicy', 'no-referrer');
+        
+        gameFrame.src = game.iframeUrl;
+        
+        gameFrame.onload = () => {
+            gameFrame.style.opacity = '1';
+            const loader = document.getElementById('game-loading');
+            if (loader) loader.remove();
+        };
+
+        gameFrame.onerror = () => {
+            const loader = document.getElementById('game-loading');
+            if (loader) {
+                loader.innerHTML = `
+                    <div class="text-red-500 font-medieval text-center p-4 max-w-md">
+                        <p class="font-bold text-2xl mb-2 uppercase">The Summoning Failed</p>
+                        <p class="text-sm opacity-80 mb-6">The magical gates are barred or the scroll is missing.</p>
+                        <button onclick="window.open('${game.iframeUrl}', '_blank')" class="bg-gold-500 text-black px-6 py-2 font-bold uppercase tracking-widest hover:bg-gold-400 transition-colors shadow-lg">
+                            Open in New Tab
+                        </button>
+                    </div>
+                `;
+            }
+        };
+    }
 
     playerOverlay.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -117,6 +138,12 @@ function openGame(game) {
 
 function closeGame() {
     playerOverlay.classList.add('hidden');
+    
+    if (activeInternalGame) {
+        activeInternalGame.stop();
+        activeInternalGame = null;
+    }
+
     gameFrame.src = '';
     gameFrame.style.opacity = '0';
     gameFrame.removeAttribute('sandbox');

@@ -1,9 +1,9 @@
 [
   {
-    "id": "2",
+    "id": "tetris",
     "title": "Tetris",
-    "thumbnail": "https://picsum.photos/seed/tetris/400/300",
-    "iframeUrl": "https://www.gstatic.com/atari/embeds/83a60601c213b72fb19c1855fb0c5f26/intermediate-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.es.WVkgP_1lvIk.O%2Fd%3D1%2Frs%3DAHpOoo-c6Cdx1P024RxwiBFfgcGlLtIitw%2Fm%3D__features__&r=969255473",
-    "sandbox": "allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-storage-access-by-user-activation"
+    "thumbnail": "https://picsum.photos/seed/tetris-arcade/400/300",
+    "type": "internal",
+    "class": "Tetris"
   }
 ]

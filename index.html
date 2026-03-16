@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Unblocked Games Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>UnblockedCasserres</title>
     <!-- Tailwind Play CDN for easy styling without build step -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,9 +12,18 @@
             theme: {
                 extend: {
                     colors: {
-                        emerald: {
-                            500: '#10b981',
+                        gold: {
+                            500: '#fbbf24',
+                            600: '#d97706',
+                        },
+                        arcade: {
+                            purple: '#a855f7',
+                            cyan: '#06b6d4',
                         }
+                    },
+                    fontFamily: {
+                        medieval: ['MedievalSharp', 'serif'],
+                        arcade: ['"Press Start 2P"', 'cursive'],
                     }
                 }
             }
@@ -21,109 +31,151 @@
     </script>
     <style>
         body {
-            background-color: #0a0a0a;
-            color: white;
+            background-color: #0f0f0f;
+            background-image: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)),
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 100% 2px, 3px 100%, 40px 40px;
+            color: #e5e7eb;
+            font-family: 'MedievalSharp', serif;
         }
-        .selection-emerald::selection {
-            background-color: rgba(16, 185, 129, 0.3);
+        .medieval-border {
+            border: 4px solid #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3), inset 0 0 10px rgba(251, 191, 36, 0.2);
+            position: relative;
+        }
+        .medieval-border::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 2px solid rgba(251, 191, 36, 0.2);
+            pointer-events: none;
+        }
+        .arcade-glow {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 100;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: fixed;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
         }
     </style>
 </head>
-<body class="selection-emerald">
+<body class="selection-gold">
+    <div class="scanline"></div>
     <div id="root" class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="sticky top-0 z-40 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10">
-            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-2 cursor-pointer group" onclick="location.reload()">
-                    <div class="p-2 bg-emerald-500 rounded-lg group-hover:rotate-12 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg>
+        <header class="sticky top-0 z-40 bg-[#1a1a1a]/90 backdrop-blur-md border-b-4 border-gold-500">
+            <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="location.reload()">
+                    <div class="p-2 bg-gold-500 rounded-sm medieval-border group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </div>
-                    <h1 class="text-xl font-bold tracking-tight hidden sm:block">
-                        UNBLOCKED<span class="text-emerald-500">GAMES</span>
+                    <h1 class="text-2xl font-medieval font-bold tracking-widest arcade-glow">
+                        UNBLOCKED<span class="text-gold-500">CASSERRES</span>
                     </h1>
                 </div>
 
                 <div class="flex-1 max-w-md relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input
                         id="search-input"
                         type="text"
-                        placeholder="Search games..."
-                        class="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
+                        placeholder="Seek thy game..."
+                        class="w-full bg-black/40 border-2 border-gold-500/30 rounded-none py-2 pl-10 pr-4 focus:outline-none focus:border-gold-500 transition-all font-medieval placeholder:text-gold-500/30"
                     />
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <button class="text-sm font-medium text-white/60 hover:text-white transition-colors">
-                        Request Game
-                    </button>
+                <div class="hidden md:flex items-center gap-6">
+                    <div class="text-gold-500 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 py-8 flex-1">
+        <main class="max-w-7xl mx-auto px-4 py-12 flex-1">
             <div id="hub-view">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold mb-2">Featured Games</h2>
-                    <p class="text-white/40">Hand-picked unblocked games for your entertainment.</p>
+                <div class="mb-12 text-center">
+                    <h2 class="text-4xl font-arcade font-bold mb-4 text-gold-500 uppercase tracking-tighter arcade-glow">Games</h2>
+                    <div class="h-1 w-32 bg-gold-500 mx-auto mb-4"></div>
+                    <p class="text-gold-500/60 font-medieval italic text-lg">To avoid being bored on philosophy and history.</p>
                 </div>
 
-                <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     <!-- Games will be injected here -->
                 </div>
             </div>
         </main>
 
         <!-- Player Overlay -->
-        <div id="player-overlay" class="fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col hidden">
-            <div class="h-16 border-b border-white/10 flex items-center justify-between px-4 bg-[#0a0a0a]">
-                <div class="flex items-center gap-4">
-                    <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2 text-white/60 hover:text-white">
+        <div id="player-overlay" class="fixed inset-0 z-50 bg-[#0f0f0f] flex flex-col hidden">
+            <div class="h-20 border-b-4 border-gold-500 flex items-center justify-between px-6 bg-[#1a1a1a]">
+                <div class="flex items-center gap-6">
+                    <button id="back-btn" class="p-2 hover:bg-gold-500/10 rounded-none transition-colors flex items-center gap-2 text-gold-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        <span class="hidden sm:inline">Back to Hub</span>
+                        <span class="font-medieval uppercase tracking-widest">Return to Games</span>
                     </button>
-                    <div class="h-6 w-px bg-white/10"></div>
-                    <h2 id="game-title" class="font-bold text-lg">Game Title</h2>
+                    <div class="h-8 w-1 bg-gold-500/20"></div>
+                    <h2 id="game-title" class="font-medieval font-bold text-2xl text-gold-500 uppercase">Game Title</h2>
                 </div>
                 
-                <div class="flex items-center gap-2">
-                    <button id="external-btn" class="p-2 hover:bg-white/10 text-white/60 hover:text-white rounded-lg transition-colors flex items-center gap-2" title="Open in New Tab">
+                <div class="flex items-center gap-4">
+                    <button id="external-btn" class="p-2 hover:bg-gold-500/10 text-gold-500 rounded-none transition-colors flex items-center gap-2" title="Open in New Tab">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        <span class="hidden md:inline text-sm">New Tab</span>
+                        <span class="hidden md:inline font-medieval uppercase text-sm">New Tab</span>
                     </button>
-                    <button id="close-btn" class="p-2 hover:bg-red-500/20 text-white/60 hover:text-red-500 rounded-lg transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <button id="close-btn" class="p-2 hover:bg-red-500/20 text-gold-500 hover:text-red-500 rounded-none transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
             </div>
-            <div class="flex-1 bg-black relative">
-                <iframe id="game-frame" src="" class="w-full h-full border-none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <div class="flex-1 bg-black relative p-4 flex items-center justify-center">
+                <div id="internal-game-container" class="hidden w-full h-full flex flex-col items-center justify-center gap-6">
+                    <div id="tetris-score" class="font-arcade text-gold-500 text-2xl arcade-glow">Score: 0</div>
+                    <div id="game-canvas-wrapper" class="medieval-border p-2 bg-black"></div>
+                    <div class="font-medieval text-gold-500/60 text-sm uppercase tracking-widest text-center">
+                        Arrows to Move & Drop • Up/W/Q to Rotate
+                    </div>
+                </div>
+                <div id="iframe-container" class="w-full h-full medieval-border overflow-hidden">
+                    <iframe id="game-frame" src="" class="w-full h-full border-none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <footer class="border-t border-white/10 py-12 mt-12 bg-white/[0.02]">
-            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="flex items-center gap-2">
-                    <div class="p-1.5 bg-emerald-500 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg>
+        <footer class="border-t-4 border-gold-500 py-16 mt-20 bg-[#1a1a1a]">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-12">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-gold-500 rounded-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </div>
-                    <span class="font-bold tracking-tight uppercase">Unblocked Games</span>
+                    <span class="font-medieval font-bold text-xl tracking-widest uppercase">UnblockedCasserres</span>
                 </div>
                 
-                <div class="flex gap-8 text-sm text-white/40">
-                    <a href="#" class="hover:text-white transition-colors">Terms</a>
-                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                    <a href="#" class="hover:text-white transition-colors">Contact</a>
-                    <a href="#" class="hover:text-white transition-colors">DMCA</a>
+                <div class="flex gap-12 font-medieval uppercase tracking-widest text-gold-500/60">
+                    <a href="#" class="hover:text-gold-500 transition-colors">Scrolls of Law</a>
+                    <a href="#" class="hover:text-gold-500 transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-gold-500 transition-colors">Messenger</a>
                 </div>
 
-                <p class="text-sm text-white/20">
-                    © 2026 Unblocked Games Hub. All rights reserved.
+                <p class="font-medieval text-sm text-gold-500/30 uppercase tracking-widest">
+                    Anno Domini 2026 • UnblockedCasserres
                 </p>
             </div>
         </footer>
     </div>
-    <script src="./src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
 </body>
 </html>
