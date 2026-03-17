@@ -4,90 +4,103 @@
     "title": "Tetris",
     "thumbnail": "https://picsum.photos/seed/tetris-arcade/400/300",
     "type": "internal",
-    "class": "Tetris"
+    "class": "Tetris",
+    "hideGenericScore": false
   },
   {
     "id": "minesweeper",
     "title": "Minesweeper",
     "thumbnail": "https://picsum.photos/seed/minesweeper-arcade/400/300",
     "type": "internal",
-    "class": "Minesweeper"
+    "class": "Minesweeper",
+    "hideGenericScore": true
   },
   {
     "id": "racing",
     "title": "Medieval Racer",
     "thumbnail": "https://picsum.photos/seed/racing-arcade/400/300",
     "type": "internal",
-    "class": "Racing"
+    "class": "Racing",
+    "hideGenericScore": false
   },
   {
     "id": "tower-defense",
     "title": "Kingdom Guard",
     "thumbnail": "https://picsum.photos/seed/tower-defense-arcade/400/300",
     "type": "internal",
-    "class": "TowerDefense"
+    "class": "TowerDefense",
+    "hideGenericScore": false
   },
   {
     "id": "apple-tycoon",
     "title": "Apple Orchard Tycoon",
     "thumbnail": "https://picsum.photos/seed/apple-orchard/400/300",
     "type": "internal",
-    "class": "AppleTycoon"
+    "class": "AppleTycoon",
+    "hideGenericScore": true
   },
   {
     "id": "dino-jump",
     "title": "Dragon Jump",
     "thumbnail": "https://picsum.photos/seed/dino-jump/400/300",
     "type": "internal",
-    "class": "DinoJump"
+    "class": "DinoJump",
+    "hideGenericScore": false
   },
   {
     "id": "snake",
     "title": "Neon Serpent",
     "thumbnail": "https://picsum.photos/seed/snake-arcade/400/300",
     "type": "internal",
-    "class": "Snake"
+    "class": "Snake",
+    "hideGenericScore": true
   },
   {
     "id": "flappy-bird",
     "title": "Dragon Flight",
     "thumbnail": "https://picsum.photos/seed/flappy-arcade/400/300",
     "type": "internal",
-    "class": "FlappyBird"
+    "class": "FlappyBird",
+    "hideGenericScore": true
   },
   {
     "id": "pong",
     "title": "Medieval Pong",
     "thumbnail": "https://picsum.photos/seed/pong-arcade/400/300",
     "type": "internal",
-    "class": "Pong"
+    "class": "Pong",
+    "hideGenericScore": true
   },
   {
     "id": "monica-escape",
     "title": "Monica's Detention Escape",
     "thumbnail": "https://picsum.photos/seed/school-escape/400/300",
     "type": "internal",
-    "class": "MonicaEscape"
+    "class": "MonicaEscape",
+    "hideGenericScore": true
   },
   {
     "id": "slots",
     "title": "Royal Slots",
     "thumbnail": "https://picsum.photos/seed/slots-arcade/400/300",
     "type": "internal",
-    "class": "Slots"
+    "class": "Slots",
+    "hideGenericScore": true
   },
   {
     "id": "tower-climber",
     "title": "Tower Climber",
     "thumbnail": "https://picsum.photos/seed/tower-climber/400/300",
     "type": "internal",
-    "class": "TowerClimber"
+    "class": "TowerClimber",
+    "hideGenericScore": true
   },
   {
     "id": "darts",
     "title": "Royal Darts",
     "thumbnail": "https://picsum.photos/seed/darts-arcade/400/300",
     "type": "internal",
-    "class": "DartsGame"
+    "class": "DartsGame",
+    "hideGenericScore": true
   }
 ]

@@ -24,6 +24,7 @@ const gameFrame = document.getElementById('game-frame');
 const iframeContainer = document.getElementById('iframe-container');
 const internalContainer = document.getElementById('internal-game-container');
 const gameTitle = document.getElementById('game-title');
+const gameScore = document.getElementById('game-score');
 const closeBtn = document.getElementById('close-btn');
 const backBtn = document.getElementById('back-btn');
 const externalBtn = document.getElementById('external-btn');
@@ -104,6 +105,13 @@ function openGame(game) {
     if (game.type === 'internal') {
         externalBtn.classList.add('hidden');
         internalContainer.classList.remove('hidden');
+        
+        if (game.hideGenericScore) {
+            gameScore.classList.add('hidden');
+        } else {
+            gameScore.classList.remove('hidden');
+            gameScore.innerText = 'Score: 0';
+        }
         
         if (game.class === 'Tetris') {
             activeInternalGame = new Tetris('game-canvas-wrapper');
