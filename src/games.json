@@ -29,7 +29,7 @@
     "thumbnail": "https://picsum.photos/seed/tower-defense-arcade/400/300",
     "type": "internal",
     "class": "TowerDefense",
-    "hideGenericScore": false
+    "hideGenericScore": true
   },
   {
     "id": "apple-tycoon",

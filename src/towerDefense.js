@@ -89,13 +89,6 @@ export class TowerDefense {
         this.update(performance.now());
     }
 
-    updateUI() {
-        const scoreEl = document.getElementById('game-score');
-        if (scoreEl && this.gameState === 'PLAYING') {
-            scoreEl.innerText = `GOLD: ${this.gold} | HEALTH: ${this.health} | MANA: ${Math.floor(this.mana)} | WAVE: ${this.wave}`;
-        }
-    }
-
     handleClick(e) {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -141,7 +134,6 @@ export class TowerDefense {
                     this.enemies.forEach(e => { e.hp -= 50; this.createEffect(e.x, e.y, '#ef4444', 8); });
                 }
             }
-            this.updateUI();
             return;
         }
 
@@ -165,7 +157,6 @@ export class TowerDefense {
                     });
                     this.gold -= type.cost;
                     this.selectedType = null;
-                    this.updateUI();
                 }
             }
         }
@@ -210,7 +201,6 @@ export class TowerDefense {
                     this.wave++; this.enemiesSpawned = 0; this.enemiesInWave += 5;
                     this.enemySpawnInterval = Math.max(150, this.enemySpawnInterval * 0.95);
                     this.waveInProgress = true;
-                    this.updateUI();
                 }, 2000);
             }
 
@@ -231,7 +221,6 @@ export class TowerDefense {
                     this.health--;
                     this.enemies.splice(i, 1);
                     if (this.health <= 0) this.gameState = 'GAMEOVER';
-                    this.updateUI();
                     return;
                 }
                 const angle = Math.atan2(target.y - en.y, target.x - en.x);
@@ -404,6 +393,14 @@ export class TowerDefense {
     }
 
     drawUI() {
+        // Draw Stats at the top
+        this.ctx.fillStyle = 'rgba(2, 6, 23, 0.7)';
+        this.ctx.fillRect(0, 0, this.width, 40);
+        this.ctx.fillStyle = '#fbbf24';
+        this.ctx.font = 'bold 12px monospace';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`GOLD: ${this.gold} | HEALTH: ${this.health} | MANA: ${Math.floor(this.mana)} | WAVE: ${this.wave}`, 15, 25);
+
         const uiY = this.height - 100;
         this.ctx.fillStyle = '#020617'; this.ctx.fillRect(0, uiY, this.width, 100);
         const slotW = this.width / 5;
