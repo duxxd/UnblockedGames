@@ -75,5 +75,12 @@
     "thumbnail": "https://picsum.photos/seed/slots-arcade/400/300",
     "type": "internal",
     "class": "Slots"
+  },
+  {
+    "id": "tower-climber",
+    "title": "Tower Climber",
+    "thumbnail": "https://picsum.photos/seed/tower-climber/400/300",
+    "type": "internal",
+    "class": "TowerClimber"
   }
 ]

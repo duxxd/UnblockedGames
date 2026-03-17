@@ -9,6 +9,7 @@ import { FlappyBird } from './flappyBird.js';
 import { Pong } from './pong.js';
 import { MonicaEscape } from './monicaEscape.js';
 import { Slots } from './slots.js';
+import { TowerClimber } from './towerClimber.js';
 
 let games = [];
 let filteredGames = [];
@@ -122,6 +123,8 @@ function openGame(game) {
             activeInternalGame = new MonicaEscape('game-canvas-wrapper');
         } else if (game.class === 'Slots') {
             activeInternalGame = new Slots('game-canvas-wrapper');
+        } else if (game.class === 'TowerClimber') {
+            activeInternalGame = new TowerClimber('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {
