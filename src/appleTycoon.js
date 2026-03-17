@@ -5,7 +5,6 @@ export class AppleTycoon {
         this.ctx = this.canvas.getContext('2d');
         this.container.appendChild(this.canvas);
 
-        // Increased width for a wider screen
         this.width = 900;
         this.height = 400;
         this.canvas.width = this.width;
@@ -18,11 +17,11 @@ export class AppleTycoon {
         
         this.gold = 500;
         this.debt = 0;
-        this.maxDebt = 5000;
-        this.loanInterestRate = 0.001; 
+        this.totalInterestPaid = 0; 
+        this.loanInterestRate = 0.001; // 0.1% base daily rate
         
         this.day = 1;
-        this.month = 4; // Start in Spring
+        this.month = 4;
         this.year = 1;
         this.season = 'Spring';
         this.seasons = ['Winter', 'Spring', 'Summer', 'Autumn'];
@@ -36,9 +35,9 @@ export class AppleTycoon {
         this.factoryLevel = 0;
         this.factoryUpgradeCost = 500;
         this.juiceProcessingRate = 0;
-        this.factoryActive = true; // Factory ON/OFF state
+        this.factoryActive = true; 
         
-        this.sellPercentage = 100; // Market sell amount state
+        this.sellPercentage = 100; 
 
         this.workers = 0;
         this.workerCost = 200;
@@ -57,14 +56,13 @@ export class AppleTycoon {
         this.trees = [];
         this.maxTrees = 15;
         this.treeCost = 50;
-        this.maintenanceCost = 0.15; // Decreased tree maintenance cost
+        this.maintenanceCost = 0.15; 
         this.landTax = 5;
         
         this.ledger = { income: 0, expenses: 0, history: [] };
         this.dailyStats = { income: 0, expenses: 0 };
 
         this.workerSprites = [];
-        // Dynamically place factory based on new width
         this.factoryBuilding = { x: this.width - 150, y: 250, width: 120, height: 100 };
 
         this.lastTime = performance.now();
@@ -86,10 +84,39 @@ export class AppleTycoon {
         this.canvas.addEventListener('click', this.boundClick);
     }
 
+    // --- UTILITIES ---
+    getAssetValue() {
+        let val = this.gold;
+        val += this.trees.length * 50;
+        val += this.mules * 300;
+        val += this.factoryLevel * 500;
+        val += this.applesInInventory * this.marketPrice * this.marketDemand;
+        val += this.juiceInInventory * this.marketPrice * this.juicePriceMultiplier * this.marketDemand;
+        
+        // CRITICAL FIX: Subtract debt to calculate true net worth instead of gross assets
+        val -= this.debt; 
+        
+        return Math.max(0, val);
+    }
+
+    getMaxDebt() {
+        return this.getAssetValue() * 10;
+    }
+
+    getEffectiveInterestRate() {
+        if (this.debt <= 0) return this.loanInterestRate;
+        const maxDebt = this.getMaxDebt();
+        if (maxDebt <= 0) return this.loanInterestRate;
+        
+        const utilization = Math.min(1, this.debt / maxDebt);
+        return this.loanInterestRate + (Math.pow(utilization, 2) * 0.049);
+    }
+
     // --- SAVE / LOAD SYSTEM ---
     saveGame() {
         const saveData = {
-            gold: this.gold, debt: this.debt, day: this.day, month: this.month, year: this.year,
+            gold: this.gold, debt: this.debt, totalInterestPaid: this.totalInterestPaid, 
+            day: this.day, month: this.month, year: this.year,
             season: this.season, weather: this.weather, applesInInventory: this.applesInInventory,
             juiceInInventory: this.juiceInInventory, storageCapacity: this.storageCapacity,
             storageUpgradeCost: this.storageUpgradeCost, factoryLevel: this.factoryLevel,
@@ -107,9 +134,9 @@ export class AppleTycoon {
         if (saved) {
             try {
                 Object.assign(this, JSON.parse(saved));
-                // Fallbacks in case an older save is loaded
                 if (this.factoryActive === undefined) this.factoryActive = true;
                 if (this.sellPercentage === undefined) this.sellPercentage = 100;
+                if (this.totalInterestPaid === undefined) this.totalInterestPaid = 0;
 
                 this.workerSprites = Array.from({length: this.workers}, () => ({
                     x: Math.random() * this.width, y: this.height - 150 + Math.random() * 40, targetX: Math.random() * this.width, speed: 1 + Math.random()
@@ -123,7 +150,7 @@ export class AppleTycoon {
     resetGame() {
         localStorage.removeItem('appleTycoonSave');
         
-        this.gold = 500; this.debt = 0; this.day = 1; this.month = 4; this.year = 1;
+        this.gold = 500; this.debt = 0; this.totalInterestPaid = 0; this.day = 1; this.month = 4; this.year = 1;
         this.season = 'Spring'; this.applesInInventory = 0; this.juiceInInventory = 0;
         this.storageCapacity = 200; this.storageUpgradeCost = 150; this.factoryLevel = 0;
         this.factoryUpgradeCost = 500; this.juiceProcessingRate = 0; this.workers = 0;
@@ -239,7 +266,7 @@ export class AppleTycoon {
         }
     }
 
-    takeLoan(amount) { if (this.debt + amount <= this.maxDebt) { this.gold += amount; this.debt += amount; } }
+    takeLoan(amount) { if (this.debt + amount <= this.getMaxDebt()) { this.gold += amount; this.debt += amount; } }
     repayLoan(amount) { const toPay = Math.min(amount, this.debt, this.gold); this.gold -= toPay; this.debt -= toPay; }
     buyMule() { if (this.gold >= this.muleCost) { this.gold -= this.muleCost; this.mules++; this.muleCost = Math.floor(this.muleCost * 1.2); } }
     buyTree() { if (this.gold >= this.treeCost && this.trees.length < this.maxTrees) { this.gold -= this.treeCost; this.addTree(this.trees.length); this.treeCost = Math.floor(this.treeCost * 1.3); } }
@@ -279,7 +306,6 @@ export class AppleTycoon {
                 
                 if (this.applesInInventory > 0) this.applesInInventory -= this.applesInInventory * 0.05; 
                 
-                // Only process juice if factory is active
                 if (this.applesInInventory > 0 && this.juiceProcessingRate > 0 && this.factoryActive) {
                     const toProcess = Math.min(this.applesInInventory, this.juiceProcessingRate);
                     this.applesInInventory -= toProcess;
@@ -289,7 +315,14 @@ export class AppleTycoon {
                 const dailyCost = (this.trees.length * this.maintenanceCost) + (this.workers * this.workerWage) + this.landTax;
                 this.dailyStats.expenses += dailyCost;
 
-                if (this.debt > 0) { const interest = this.debt * this.loanInterestRate; this.debt += interest; this.dailyStats.expenses += interest; }
+                if (this.debt > 0) { 
+                    const rate = this.getEffectiveInterestRate();
+                    const interest = this.debt * rate; 
+                    this.debt += interest; 
+                    this.dailyStats.expenses += interest; 
+                    this.totalInterestPaid += interest; 
+                }
+                
                 if (this.season === 'Winter' && this.mules > 0) { const mInc = this.mules * this.muleLeaseIncome; this.gold += mInc; this.dailyStats.income += mInc; }
 
                 this.gold -= dailyCost;
@@ -395,7 +428,6 @@ export class AppleTycoon {
         const info = `GOLD: ${Math.floor(this.gold)}G | DEBT: ${Math.floor(this.debt)}G | APPLES: ${Math.floor(this.applesInInventory)}/${this.storageCapacity} | JUICE: ${Math.floor(this.juiceInInventory)} | DATE: Y${this.year} M${this.month} D${this.day} (${this.season})`;
         this.ctx.fillText(info, 15, 25);
 
-        // Position speed controls relative to new width
         this.drawButton(this.width - 130, 8, 30, 24, this.timeSpeed === 0 ? '#3b82f6' : '#475569', '||', '', 'speed_pause');
         this.drawButton(this.width - 90, 8, 30, 24, this.timeSpeed === 1 ? '#3b82f6' : '#475569', '>', '', 'speed_1x');
         this.drawButton(this.width - 50, 8, 40, 24, this.timeSpeed === 3 ? '#3b82f6' : '#475569', '>>', '', 'speed_3x');
@@ -443,7 +475,6 @@ export class AppleTycoon {
             this.ctx.fillText(`Market Event: ${this.marketEvent}`, mx + mw/2, my + 70);
             this.ctx.fillText(`Apple Value: ${(this.marketPrice * this.marketDemand).toFixed(2)}G | Juice Value: ${(this.marketPrice * this.juicePriceMultiplier * this.marketDemand).toFixed(2)}G`, mx + mw/2, my + 95);
             
-            // Percentage selection UI
             this.ctx.fillText(`Sell Percentage: ${this.sellPercentage}%`, mx + mw/2, my + 130);
             this.drawButton(mx + 90, my + 145, 60, 30, this.sellPercentage === 25 ? '#3b82f6' : '#475569', '25%', '', 'sell_25');
             this.drawButton(mx + 175, my + 145, 60, 30, this.sellPercentage === 50 ? '#3b82f6' : '#475569', '50%', '', 'sell_50');
@@ -462,24 +493,31 @@ export class AppleTycoon {
             this.drawButton(mx + 260, my + 80, 200, 60, this.gold >= this.storageUpgradeCost ? '#a855f7' : '#475569', 'UPGRADE BARN', `Cost: ${this.storageUpgradeCost}G`, 'upgrade_storage');
             this.drawButton(mx + 40, my + 160, 200, 60, this.gold >= this.workerCost ? '#f59e0b' : '#475569', 'HIRE WORKER', `Cost: ${this.workerCost}G`, 'hire_worker');
             
-            // Factory Section adjusted to fit ON/OFF toggle
-            this.drawButton(mx + 260, my + 160, 140, 60, this.gold >= this.factoryUpgradeCost ? '#ec4899' : '#475569', 'JUICE FACTORY', `Cost: ${this.factoryUpgradeCost}G`, 'upgrade_factory');
+            this.drawButton(mx + 260, my + 160, 130, 60, this.gold >= this.factoryUpgradeCost ? '#ec4899' : '#475569', 'JUICE FACTORY', `Cost: ${this.factoryUpgradeCost}G`, 'upgrade_factory');
             if (this.factoryLevel > 0) {
-                this.drawButton(mx + 410, my + 160, 50, 60, this.factoryActive ? '#10b981' : '#ef4444', 'PWR', this.factoryActive ? 'ON' : 'OFF', 'toggle_factory');
+                this.drawButton(mx + 400, my + 160, 60, 60, this.factoryActive ? '#10b981' : '#ef4444', 'PWR', this.factoryActive ? 'ON' : 'OFF', 'toggle_factory');
             }
         }
         else if (this.openModal === 'bank') {
-            this.ctx.font = 'bold 24px Arial'; this.ctx.fillText('NATIONAL BANK', mx + mw/2, my + 40);
+            this.ctx.font = 'bold 24px Arial'; this.ctx.fillText('NATIONAL BANK', mx + mw/2, my + 30);
             
-            this.drawButton(mx + 40, my + 80, 130, 50, this.debt + 100 <= this.maxDebt ? '#10b981' : '#475569', 'LOAN 100G', '+100G', 'loan_100');
-            this.drawButton(mx + 185, my + 80, 130, 50, this.debt + 500 <= this.maxDebt ? '#10b981' : '#475569', 'LOAN 500G', '+500G', 'loan_500');
-            this.drawButton(mx + 40, my + 140, 130, 50, this.gold >= 100 && this.debt >= 100 ? '#ef4444' : '#475569', 'REPAY 100G', '-100G', 'repay_100');
-            this.drawButton(mx + 185, my + 140, 130, 50, this.gold >= 500 && this.debt >= 500 ? '#ef4444' : '#475569', 'REPAY 500G', '-500G', 'repay_500');
+            this.ctx.font = '12px Arial';
+            this.ctx.fillStyle = '#fbbf24';
+            const rateStr = (this.getEffectiveInterestRate() * 100).toFixed(2);
             
-            this.ctx.fillStyle = '#94a3b8'; this.ctx.fillRect(mx + 330, my + 80, 2, 110);
+            // "Net Assets" instead of just "Assets" to clarify the calculation
+            this.ctx.fillText(`Net Assets: ${this.getAssetValue().toFixed(0)}G | Max Borrow: ${this.getMaxDebt().toFixed(0)}G`, mx + mw/2, my + 50);
+            this.ctx.fillText(`Current Interest Rate: ${rateStr}% | Lifetime Paid: ${this.totalInterestPaid.toFixed(1)}G`, mx + mw/2, my + 65);
+
+            this.drawButton(mx + 40, my + 85, 130, 50, this.debt + 100 <= this.getMaxDebt() ? '#10b981' : '#475569', 'LOAN 100G', '+100G', 'loan_100');
+            this.drawButton(mx + 185, my + 85, 130, 50, this.debt + 500 <= this.getMaxDebt() ? '#10b981' : '#475569', 'LOAN 500G', '+500G', 'loan_500');
+            this.drawButton(mx + 40, my + 145, 130, 50, this.gold >= 100 && this.debt >= 100 ? '#ef4444' : '#475569', 'REPAY 100G', '-100G', 'repay_100');
+            this.drawButton(mx + 185, my + 145, 130, 50, this.gold >= 500 && this.debt >= 500 ? '#ef4444' : '#475569', 'REPAY 500G', '-500G', 'repay_500');
             
-            this.drawButton(mx + 345, my + 110, 130, 50, this.gold >= this.muleCost ? '#6366f1' : '#475569', 'BUY MULE', `Cost: ${this.muleCost}G`, 'buy_mule');
-            this.ctx.fillStyle = '#fff'; this.ctx.font = '12px Arial'; this.ctx.fillText(`Mules Owned: ${this.mules}`, mx + 410, my + 180);
+            this.ctx.fillStyle = '#94a3b8'; this.ctx.fillRect(mx + 330, my + 85, 2, 110);
+            
+            this.drawButton(mx + 345, my + 115, 130, 50, this.gold >= this.muleCost ? '#6366f1' : '#475569', 'BUY MULE', `Cost: ${this.muleCost}G`, 'buy_mule');
+            this.ctx.fillStyle = '#fff'; this.ctx.font = '12px Arial'; this.ctx.fillText(`Mules Owned: ${this.mules}`, mx + 410, my + 185);
         }
         else if (this.openModal === 'ledger') {
             this.ctx.font = 'bold 24px Arial'; this.ctx.fillText('FINANCIAL LEDGER', mx + mw/2, my + 40);
@@ -531,7 +569,6 @@ export class AppleTycoon {
         this.ctx.fillStyle = this.season === 'Winter' ? '#cbd5e1' : (this.season === 'Autumn' ? '#451a03' : '#064e3b');
         this.ctx.beginPath(); 
         this.ctx.moveTo(0, 100); 
-        // Curve updated to fit new width perfectly
         this.ctx.quadraticCurveTo(this.width / 2, 50, this.width, 100); 
         this.ctx.lineTo(this.width, 150); 
         this.ctx.lineTo(0, 150); 
