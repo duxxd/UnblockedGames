@@ -10,6 +10,7 @@ import { Pong } from './pong.js';
 import { MonicaEscape } from './monicaEscape.js';
 import { Slots } from './slots.js';
 import { TowerClimber } from './towerClimber.js';
+import { DartsGame } from './dartsGame.js';
 
 let games = [];
 let filteredGames = [];
@@ -93,6 +94,9 @@ function openGame(game) {
     gameTitle.textContent = game.title;
     
     // Reset views
+    const wrapper = document.getElementById('game-canvas-wrapper');
+    if (wrapper) wrapper.innerHTML = '';
+    
     iframeContainer.classList.add('hidden');
     internalContainer.classList.add('hidden');
     externalBtn.classList.remove('hidden');
@@ -125,6 +129,8 @@ function openGame(game) {
             activeInternalGame = new Slots('game-canvas-wrapper');
         } else if (game.class === 'TowerClimber') {
             activeInternalGame = new TowerClimber('game-canvas-wrapper');
+        } else if (game.class === 'DartsGame') {
+            activeInternalGame = new DartsGame('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {

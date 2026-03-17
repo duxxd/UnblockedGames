@@ -82,5 +82,12 @@
     "thumbnail": "https://picsum.photos/seed/tower-climber/400/300",
     "type": "internal",
     "class": "TowerClimber"
+  },
+  {
+    "id": "darts",
+    "title": "Royal Darts",
+    "thumbnail": "https://picsum.photos/seed/darts-arcade/400/300",
+    "type": "internal",
+    "class": "DartsGame"
   }
 ]
