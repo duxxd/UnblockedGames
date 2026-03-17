@@ -102,5 +102,21 @@
     "type": "internal",
     "class": "DartsGame",
     "hideGenericScore": true
+  },
+  {
+    "id": "breakout",
+    "title": "Castle Breaker",
+    "thumbnail": "https://picsum.photos/seed/breakout-arcade/400/300",
+    "type": "internal",
+    "class": "Breakout",
+    "hideGenericScore": true
+  },
+  {
+    "id": "israel-clicker",
+    "title": "Israel Clicker",
+    "thumbnail": "https://picsum.photos/seed/israel-arcade/400/300",
+    "type": "internal",
+    "class": "IsraelClicker",
+    "hideGenericScore": true
   }
 ]

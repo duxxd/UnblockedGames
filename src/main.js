@@ -11,6 +11,8 @@ import { MonicaEscape } from './monicaEscape.js';
 import { Slots } from './slots.js';
 import { TowerClimber } from './towerClimber.js';
 import { DartsGame } from './dartsGame.js';
+import { Breakout } from './breakout.js';
+import { IsraelClicker } from './israelClicker.js';
 
 let games = [];
 let filteredGames = [];
@@ -139,6 +141,10 @@ function openGame(game) {
             activeInternalGame = new TowerClimber('game-canvas-wrapper');
         } else if (game.class === 'DartsGame') {
             activeInternalGame = new DartsGame('game-canvas-wrapper');
+        } else if (game.class === 'Breakout') {
+            activeInternalGame = new Breakout('game-canvas-wrapper');
+        } else if (game.class === 'IsraelClicker') {
+            activeInternalGame = new IsraelClicker('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {

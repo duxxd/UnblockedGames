@@ -69,17 +69,22 @@
             0% { bottom: 100%; }
             100% { bottom: -100px; }
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+        .custom-scrollbar::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track,
+        body::-webkit-scrollbar-track {
             background: #000;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .custom-scrollbar::-webkit-scrollbar-thumb,
+        body::-webkit-scrollbar-thumb {
             background: #fbbf24;
             border-radius: 0;
+            border: 2px solid #000;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+        body::-webkit-scrollbar-thumb:hover {
             background: #d97706;
         }
         #game-canvas-wrapper canvas {
@@ -106,13 +111,13 @@
                     </h1>
                 </div>
 
-                <div class="flex-1 max-w-md relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <div class="flex-1 max-w-md relative group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-gold-500/60 group-focus-within:text-gold-500 transition-colors"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input
                         id="search-input"
                         type="text"
                         placeholder="Seek thy game..."
-                        class="w-full bg-black/40 border-2 border-gold-500/30 rounded-none py-2 pl-10 pr-4 focus:outline-none focus:border-gold-500 transition-all font-medieval placeholder:text-gold-500/30"
+                        class="w-full bg-black/40 border-2 border-gold-500/30 rounded-none py-2 pl-10 pr-4 focus:outline-none focus:border-gold-500 focus:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all font-medieval placeholder:text-gold-500/30"
                     />
                 </div>
 
