@@ -13,6 +13,9 @@ export class TowerClimber {
         this.gravity = 0.5;
         this.friction = 0.8;
         this.score = 0;
+        this.lives = 3;
+        this.bonus = 5000;
+        this.bonusTimer = 0;
         this.gameState = 'playing';
 
         this.player = {
@@ -25,33 +28,13 @@ export class TowerClimber {
             speed: 4,
             jumpForce: -7,
             onGround: false,
-            climbing: false
+            climbing: false,
+            hasHammer: false,
+            hammerTime: 0
         };
 
         this.initLevel();
 
-        this.barrelSpawnTimer = 0;
-        this.barrelSpawnRate = 120; // frames
-
-        this.hammer = {
-            active: false,
-            timer: 0,
-            duration: 300, // 5 seconds at 60fps
-            x: 0,
-            y: 0,
-            width: 20,
-            height: 20,
-            spawned: false
-        };
-
-        this.pauline = {
-            x: 0,
-            y: 0,
-            width: 20,
-            height: 30
-        };
-
-        this.running = false;
         this.keys = {};
         this.boundKeyDown = this.handleKeyDown.bind(this);
         this.boundKeyUp = this.handleKeyUp.bind(this);
@@ -76,9 +59,17 @@ export class TowerClimber {
         this.platforms = [];
         this.ladders = [];
         this.barrels = [];
+        this.fireballs = [];
+        this.hammers = [];
         
-        // Ground (flat)
-        this.platforms.push({ x: 0, y: this.height - 30, w: 600, h: 30, dir: 0, slope: 0 });
+        // Ground
+        this.platforms.push({ x: 0, y: this.height - 30, w: 600, h: 30, dir: 0 });
+        
+        // Oil Drum at bottom left
+        this.oilDrum = { x: 40, y: this.height - 80, width: 40, height: 50 };
+        
+        this.kong = { x: 0, y: 0, width: 60, height: 70 };
+        this.pauline = { x: 0, y: 0, width: 20, height: 30 };
         
         const levelHeight = 100;
         const numLevels = 6;
@@ -87,35 +78,45 @@ export class TowerClimber {
         for (let i = 1; i <= numLevels; i++) {
             const y = (this.height - 30) - i * levelHeight;
             const gapSide = lastGapSide === 'right' ? 'left' : 'right';
-            const slope = gapSide === 'left' ? -0.05 : 0.05; // Slanted platforms
             
             if (gapSide === 'left') {
-                this.platforms.push({ x: 60, y: y, w: 540, h: 20, dir: -1, slope: slope });
+                this.platforms.push({ x: 60, y: y, w: 540, h: 20, dir: -1 });
                 this.ladders.push({ x: 520, y: y, w: 30, h: levelHeight + 20 });
+                if (i === 2 || i === 5) {
+                    this.hammers.push({ x: 400, y: y - 25, w: 15, h: 25, active: true });
+                }
             } else {
-                this.platforms.push({ x: 0, y: y, w: 540, h: 20, dir: 1, slope: slope });
+                this.platforms.push({ x: 0, y: y, w: 540, h: 20, dir: 1 });
                 this.ladders.push({ x: 50, y: y, w: 30, h: levelHeight + 20 });
+                if (i === 3) {
+                    this.hammers.push({ x: 150, y: y - 25, w: 15, h: 25, active: true });
+                }
             }
             lastGapSide = gapSide;
         }
         
+        // Goal area
         const goalY = (this.height - 30) - (numLevels + 1) * levelHeight;
-        this.platforms.push({ x: 200, y: goalY, w: 200, h: 20, dir: 0, slope: 0 });
-        this.ladders.push({ x: 285, y: goalY, w: 30, h: levelHeight + 20 });
+        // Pauline's platform
+        this.platforms.push({ x: 250, y: goalY, w: 100, h: 20, dir: 0 });
+        // Kong's platform
+        this.platforms.push({ x: 50, y: goalY + 40, w: 150, h: 20, dir: 0 });
         
-        this.kong = { x: 210, y: goalY - 50, width: 40, height: 50, frame: 0 };
-        this.pauline = { x: 350, y: goalY - 30, width: 20, height: 30 };
+        // Top ladder to Pauline
+        this.ladders.push({ x: 285, y: goalY, w: 30, h: 60 });
+        
+        this.kong.y = goalY + 40 - this.kong.height;
+        this.kong.x = 70;
 
-        // Spawn Hammer on a random middle platform
-        const hammerLevel = Math.floor(Math.random() * (numLevels - 2)) + 2;
-        const hp = this.platforms[hammerLevel];
-        this.hammer.x = hp.x + hp.w / 2;
-        this.hammer.y = hp.y - 25;
-        this.hammer.spawned = true;
-        this.hammer.active = false;
+        this.pauline.y = goalY - this.pauline.height;
+        this.pauline.x = 290;
 
         this.barrelSpawnTimer = 0;
         this.barrelSpawnRate = 120;
+        this.fireballSpawnTimer = 0;
+        this.fireballSpawnRate = 400; // Slower natural spawn, mostly from barrels
+        this.bonus = 5000;
+        this.bonusTimer = 0;
     }
 
     reset() {
@@ -123,15 +124,15 @@ export class TowerClimber {
         this.player.y = this.height - 60;
         this.player.vx = 0;
         this.player.vy = 0;
-        this.hammer.active = false;
-        this.hammer.spawned = true;
-        this.initLevel();
+        this.player.hasHammer = false;
+        this.player.hammerTime = 0;
+        this.lives = 3;
         this.score = 0;
+        this.initLevel();
         this.gameState = 'playing';
     }
 
     start() {
-        this.running = true;
         window.addEventListener('keydown', this.boundKeyDown);
         window.addEventListener('keyup', this.boundKeyUp);
         this.canvas.addEventListener('click', this.boundClick);
@@ -139,7 +140,6 @@ export class TowerClimber {
     }
 
     stop() {
-        this.running = false;
         window.removeEventListener('keydown', this.boundKeyDown);
         window.removeEventListener('keyup', this.boundKeyUp);
         this.canvas.removeEventListener('click', this.boundClick);
@@ -147,17 +147,24 @@ export class TowerClimber {
     }
 
     update() {
-        if (!this.running) return;
-
         if (this.gameState === 'playing') {
+            this.bonusTimer++;
+            if (this.bonusTimer >= 60) {
+                this.bonus = Math.max(0, this.bonus - 100);
+                this.bonusTimer = 0;
+            }
+
+            if (this.player.hasHammer) {
+                this.player.hammerTime--;
+                if (this.player.hammerTime <= 0) {
+                    this.player.hasHammer = false;
+                }
+            }
+
             this.updatePlayer();
             this.updateBarrels();
+            this.updateFireballs();
             this.checkCollisions();
-            
-            if (this.hammer.active) {
-                this.hammer.timer--;
-                if (this.hammer.timer <= 0) this.hammer.active = false;
-            }
         }
 
         this.draw();
@@ -219,13 +226,10 @@ export class TowerClimber {
 
         this.platforms.forEach(p => {
             if (this.player.x + this.player.width > p.x && this.player.x < p.x + p.w) {
-                // Calculate platform Y at player's X position for slanted platforms
-                const relativeX = (this.player.x + this.player.width / 2) - p.x;
-                const platformYAtX = p.y + (p.slope ? relativeX * p.slope : 0);
-
-                if (this.player.vy >= 0 && prevBottom <= platformYAtX + 5 && currentBottom >= platformYAtX) {
+                // Check if player's feet passed through the platform top
+                if (this.player.vy >= 0 && prevBottom <= p.y && currentBottom >= p.y) {
                     if (!this.player.climbing || (this.player.climbing && !this.keys['ArrowUp'] && !this.keys['KeyW'])) {
-                        this.player.y = platformYAtX - this.player.height;
+                        this.player.y = p.y - this.player.height;
                         this.player.vy = 0;
                         this.player.onGround = true;
                         this.player.climbing = false;
@@ -233,18 +237,6 @@ export class TowerClimber {
                 }
             }
         });
-
-        // Hammer pickup
-        if (this.hammer.spawned && !this.hammer.active) {
-            if (this.player.x < this.hammer.x + this.hammer.width &&
-                this.player.x + this.player.width > this.hammer.x &&
-                this.player.y < this.hammer.y + this.hammer.height &&
-                this.player.y + this.player.height > this.hammer.y) {
-                this.hammer.active = true;
-                this.hammer.spawned = false;
-                this.hammer.timer = this.hammer.duration;
-            }
-        }
 
         // Jump
         if ((this.keys['Space'] || this.keys['ArrowUp'] || this.keys['KeyW']) && this.player.onGround && !this.player.climbing) {
@@ -265,13 +257,11 @@ export class TowerClimber {
                 x: this.kong.x + this.kong.width / 2,
                 y: this.kong.y + this.kong.height - 10,
                 r: 10,
-                vx: Math.random() > 0.5 ? 2 : -2,
+                vx: Math.random() > 0.5 ? 2 : -2, // Initial push
                 vy: 0
             });
             this.barrelSpawnTimer = 0;
-            this.kong.frame = 30; // Animate Kong
         }
-        if (this.kong.frame > 0) this.kong.frame--;
 
         this.barrels.forEach((b, index) => {
             const bPrevBottom = b.y + b.r;
@@ -280,52 +270,173 @@ export class TowerClimber {
             b.y += b.vy;
             const bCurrentBottom = b.y + b.r;
 
-            if (b.x - b.r < 0) { b.x = b.r; b.vx = 0; }
-            if (b.x + b.r > this.width) { b.x = this.width - b.r; b.vx = 0; }
+            // Wall constraints (no bounce)
+            if (b.x - b.r < 0) {
+                b.x = b.r;
+                b.vx = 0;
+            }
+            if (b.x + b.r > this.width) {
+                b.x = this.width - b.r;
+                b.vx = 0;
+            }
 
             let onPlatform = false;
             this.platforms.forEach(p => {
                 if (b.x + b.r > p.x && b.x - b.r < p.x + p.w) {
-                    const relativeX = b.x - p.x;
-                    const platformYAtX = p.y + (p.slope ? relativeX * p.slope : 0);
-
-                    if (b.vy >= 0 && bPrevBottom <= platformYAtX + 5 && bCurrentBottom >= platformYAtX) {
-                        b.y = platformYAtX - b.r;
+                    if (b.vy >= 0 && bPrevBottom <= p.y && bCurrentBottom >= p.y) {
+                        b.y = p.y - b.r;
                         b.vy = 0;
                         onPlatform = true;
-                        if (p.dir !== 0) b.vx = p.dir * 3;
+                        
+                        // Follow platform direction
+                        if (p.dir !== 0) {
+                            b.vx = p.dir * 3;
+                        }
                     }
                 }
             });
 
+            // Barrel hits oil drum? Transform to fireball
+            if (b.x > this.oilDrum.x && b.x < this.oilDrum.x + this.oilDrum.width &&
+                b.y + b.r > this.oilDrum.y && b.y < this.oilDrum.y + this.oilDrum.height) {
+                this.barrels.splice(index, 1);
+                this.spawnFireball();
+                return;
+            }
+
+            // Remove off-screen barrels
             if (b.y > this.height) {
                 this.barrels.splice(index, 1);
                 this.score += 10;
             }
+        });
+    }
 
-            // Hammer smash
-            if (this.hammer.active) {
-                let dx = this.player.x + this.player.width / 2 - b.x;
-                let dy = this.player.y + this.player.height / 2 - b.y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 40) {
-                    this.barrels.splice(index, 1);
-                    this.score += 50;
+    spawnFireball() {
+        this.fireballs.push({
+            x: this.oilDrum.x + this.oilDrum.width / 2,
+            y: this.oilDrum.y,
+            r: 8,
+            vx: Math.random() > 0.5 ? 2 : -2,
+            vy: -5, // Jump out of drum
+            climbChance: 0.02
+        });
+    }
+
+    updateFireballs() {
+        this.fireballSpawnTimer++;
+        if (this.fireballSpawnTimer > this.fireballSpawnRate) {
+            this.spawnFireball();
+            this.fireballSpawnTimer = 0;
+        }
+
+        this.fireballs.forEach((f, index) => {
+            const fPrevBottom = f.y + f.r;
+            f.vy += this.gravity;
+            f.x += f.vx;
+            f.y += f.vy;
+            const fCurrentBottom = f.y + f.r;
+
+            if (f.x - f.r < 0 || f.x + f.r > this.width) f.vx *= -1;
+
+            let onPlatform = false;
+            this.platforms.forEach(p => {
+                if (f.x + f.r > p.x && f.x - f.r < p.x + p.w) {
+                    if (f.vy >= 0 && fPrevBottom <= p.y && fCurrentBottom >= p.y) {
+                        f.y = p.y - f.r;
+                        f.vy = 0;
+                        onPlatform = true;
+                    }
                 }
-            }
+            });
+
+            // Fireballs can climb ladders
+            this.ladders.forEach(l => {
+                if (f.x > l.x && f.x < l.x + l.w && Math.random() < f.climbChance) {
+                    f.vy = -2;
+                }
+            });
         });
     }
 
     checkCollisions() {
-        this.barrels.forEach(b => {
+        // Hammer collection
+        this.hammers.forEach(h => {
+            if (h.active && 
+                this.player.x < h.x + h.w &&
+                this.player.x + this.player.width > h.x &&
+                this.player.y < h.y + h.h &&
+                this.player.y + this.player.height > h.y) {
+                h.active = false;
+                this.player.hasHammer = true;
+                this.player.hammerTime = 600; // 10 seconds
+            }
+        });
+
+        // Barrel collision
+        this.barrels.forEach((b, index) => {
             let dx = this.player.x + this.player.width / 2 - b.x;
             let dy = this.player.y + this.player.height / 2 - b.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance < (this.player.width / 2 + b.r)) {
-                this.gameState = 'gameover';
+                if (this.player.hasHammer) {
+                    this.barrels.splice(index, 1);
+                    this.score += 500;
+                } else {
+                    this.die();
+                }
+            }
+
+            // Jump over barrel score
+            if (!this.player.onGround && !this.player.climbing && 
+                Math.abs(this.player.x - b.x) < 10 && 
+                this.player.y + this.player.height < b.y) {
+                if (!b.scored) {
+                    this.score += 100;
+                    b.scored = true;
+                }
             }
         });
+
+        // Fireball collision
+        this.fireballs.forEach((f, index) => {
+            let dx = this.player.x + this.player.width / 2 - f.x;
+            let dy = this.player.y + this.player.height / 2 - f.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < (this.player.width / 2 + f.r)) {
+                if (this.player.hasHammer) {
+                    this.fireballs.splice(index, 1);
+                    this.score += 800;
+                } else {
+                    this.die();
+                }
+            }
+        });
+
+        // Pauline collision (Win)
+        if (this.player.x < this.pauline.x + this.pauline.width &&
+            this.player.x + this.player.width > this.pauline.x &&
+            this.player.y < this.pauline.y + this.pauline.height &&
+            this.player.y + this.player.height > this.pauline.y) {
+            this.score += this.bonus;
+            this.gameState = 'won';
+        }
+    }
+
+    die() {
+        this.lives--;
+        if (this.lives <= 0) {
+            this.gameState = 'gameover';
+        } else {
+            this.player.x = 50;
+            this.player.y = this.height - 60;
+            this.player.vx = 0;
+            this.player.vy = 0;
+            this.player.hasHammer = false;
+            this.player.hammerTime = 0;
+        }
     }
 
     draw() {
@@ -350,52 +461,51 @@ export class TowerClimber {
         // Draw Platforms
         this.ctx.fillStyle = '#fbbf24';
         this.platforms.forEach(p => {
-            if (p.slope) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(p.x, p.y);
-                this.ctx.lineTo(p.x + p.w, p.y + p.w * p.slope);
-                this.ctx.lineTo(p.x + p.w, p.y + p.w * p.slope + p.h);
-                this.ctx.lineTo(p.x, p.y + p.h);
-                this.ctx.closePath();
-                this.ctx.fill();
-            } else {
-                this.ctx.fillRect(p.x, p.y, p.w, p.h);
+            this.ctx.fillRect(p.x, p.y, p.w, p.h);
+        });
+
+        // Draw Oil Drum
+        this.ctx.fillStyle = '#3b82f6';
+        this.ctx.fillRect(this.oilDrum.x, this.oilDrum.y, this.oilDrum.width, this.oilDrum.height);
+        this.ctx.fillStyle = '#1d4ed8';
+        this.ctx.fillRect(this.oilDrum.x + 5, this.oilDrum.y + 5, 30, 10);
+        this.ctx.fillStyle = '#ef4444'; // Fire in drum
+        if (Math.random() > 0.5) {
+            this.ctx.fillRect(this.oilDrum.x + 10, this.oilDrum.y - 10, 20, 10);
+        }
+
+        // Draw Hammers
+        this.ctx.fillStyle = '#9ca3af';
+        this.hammers.forEach(h => {
+            if (h.active) {
+                this.ctx.fillRect(h.x, h.y, h.w, h.h);
+                this.ctx.fillStyle = '#4b5563';
+                this.ctx.fillRect(h.x - 5, h.y, 25, 10);
             }
         });
 
-        // Draw Hammer
-        if (this.hammer.spawned) {
-            this.ctx.fillStyle = '#facc15';
-            this.ctx.fillRect(this.hammer.x, this.hammer.y, this.hammer.width, this.hammer.height);
-            this.ctx.fillStyle = '#854d0e';
-            this.ctx.fillRect(this.hammer.x + 8, this.hammer.y + 20, 4, 10);
-        }
+        // Draw Kong
+        this.ctx.fillStyle = '#4b2c20';
+        this.ctx.fillRect(this.kong.x, this.kong.y, this.kong.width, this.kong.height);
+        this.ctx.fillStyle = '#d2b48c';
+        this.ctx.fillRect(this.kong.x + 5, this.kong.y + 10, 30, 20);
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(this.kong.x + 10, this.kong.y + 15, 5, 5);
+        this.ctx.fillRect(this.kong.x + 25, this.kong.y + 15, 5, 5);
 
         // Draw Pauline
         this.ctx.fillStyle = '#f472b6';
         this.ctx.fillRect(this.pauline.x, this.pauline.y, this.pauline.width, this.pauline.height);
-        this.ctx.fillStyle = 'white';
-        this.ctx.fillRect(this.pauline.x + 4, this.pauline.y + 5, 4, 4);
-        this.ctx.fillRect(this.pauline.x + 12, this.pauline.y + 5, 4, 4);
-
-        // Draw Kong
-        this.ctx.fillStyle = '#4b2c20';
-        let kongY = this.kong.y + (this.kong.frame > 0 ? -10 : 0);
-        this.ctx.fillRect(this.kong.x, kongY, this.kong.width, this.kong.height);
-        this.ctx.fillStyle = '#d2b48c';
-        this.ctx.fillRect(this.kong.x + 5, kongY + 10, 30, 20);
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(this.kong.x + 10, kongY + 15, 5, 5);
-        this.ctx.fillRect(this.kong.x + 25, kongY + 15, 5, 5);
+        this.ctx.fillStyle = '#fdf2f8';
+        this.ctx.fillRect(this.pauline.x + 4, this.pauline.y + 5, 12, 10);
 
         // Draw Player
-        this.ctx.fillStyle = this.hammer.active ? '#facc15' : '#ef4444';
+        this.ctx.fillStyle = this.player.hasHammer ? '#fbbf24' : '#ef4444';
         this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
-        if (this.hammer.active) {
-            this.ctx.fillStyle = 'white';
-            this.ctx.fillRect(this.player.x - 10, this.player.y - 10, 10, 10);
+        if (this.player.hasHammer) {
+            this.ctx.fillStyle = '#9ca3af';
+            this.ctx.fillRect(this.player.x + (this.player.vx >= 0 ? 20 : -10), this.player.y + 5, 10, 20);
         }
-        // Eyes
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(this.player.x + 4, this.player.y + 5, 4, 4);
         this.ctx.fillRect(this.player.x + 12, this.player.y + 5, 4, 4);
@@ -410,16 +520,29 @@ export class TowerClimber {
             this.ctx.stroke();
         });
 
+        // Draw Fireballs
+        this.ctx.fillStyle = '#f97316';
+        this.fireballs.forEach(f => {
+            this.ctx.beginPath();
+            this.ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.fillStyle = '#fbbf24';
+            this.ctx.beginPath();
+            this.ctx.arc(f.x, f.y, f.r / 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+
         // UI
         this.ctx.fillStyle = '#fbbf24';
-        this.ctx.font = '20px "Press Start 2P", cursive';
+        this.ctx.font = '16px "Press Start 2P", cursive';
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`SCORE: ${this.score}`, 20, 40);
-
-        if (this.hammer.active) {
-            this.ctx.fillStyle = '#facc15';
-            this.ctx.font = '12px "Press Start 2P", cursive';
-            this.ctx.fillText(`HAMMER ACTIVE: ${Math.ceil(this.hammer.timer / 60)}s`, 20, 70);
+        this.ctx.fillText(`LIVES: ${this.lives}`, 20, 70);
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`BONUS: ${this.bonus}`, this.width - 20, 40);
+        if (this.player.hasHammer) {
+            this.ctx.fillStyle = '#fbbf24';
+            this.ctx.fillText(`HAMMER: ${Math.ceil(this.player.hammerTime / 60)}s`, this.width - 20, 70);
         }
 
         if (this.gameState === 'won') {
