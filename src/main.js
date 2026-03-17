@@ -13,6 +13,8 @@ import { TowerClimber } from './towerClimber.js';
 import { DartsGame } from './dartsGame.js';
 import { Breakout } from './breakout.js';
 import { IsraelClicker } from './israelClicker.js';
+import { Billiards } from './billiards.js';
+import { CorrnaGame } from './corrnaGame.js';
 
 let games = [];
 let filteredGames = [];
@@ -145,6 +147,10 @@ function openGame(game) {
             activeInternalGame = new Breakout('game-canvas-wrapper');
         } else if (game.class === 'IsraelClicker') {
             activeInternalGame = new IsraelClicker('game-canvas-wrapper');
+        } else if (game.class === 'Billiards') {
+            activeInternalGame = new Billiards('game-canvas-wrapper');
+        } else if (game.class === 'CorrnaGame') {
+            activeInternalGame = new CorrnaGame('game-canvas-wrapper');
         }
 
         if (activeInternalGame && typeof activeInternalGame.start === 'function') {

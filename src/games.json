@@ -118,5 +118,21 @@
     "type": "internal",
     "class": "IsraelClicker",
     "hideGenericScore": true
+  },
+  {
+    "id": "billiards",
+    "title": "Royal Billiards",
+    "thumbnail": "https://picsum.photos/seed/billiards-arcade/400/300",
+    "type": "internal",
+    "class": "Billiards",
+    "hideGenericScore": true
+  },
+  {
+    "id": "corrna-game",
+    "title": "Corrna Game",
+    "thumbnail": "https://www.pescadoscastellon.es/wp-content/uploads/19443-2.jpg",
+    "type": "internal",
+    "class": "CorrnaGame",
+    "hideGenericScore": true
   }
 ]
